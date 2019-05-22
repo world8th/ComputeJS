@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --sourceMap --validate --debug    --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd,mutable-global",
+    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --sourceMap --validate --optimize --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd,mutable-global",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0"
+  },
+  "dependencies": {
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.2"
+  }
+}
