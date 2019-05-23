@@ -22,11 +22,6 @@
             image.src = "images/test.png";
             await promise;
 
-            ctx.drawImage(image,0,0);
-            let imageData = ctx.getImageData(0,0,640,480);
-            let size = Math.min(imageData.width*imageData.height*4,1024*1024*1024);
-            
-
             //let computeSource = URL.createObjectURL(await (await fetch("./src/compute.js")).blob());
 
             // import compute library 
@@ -40,6 +35,10 @@
             let workgroup = await compute.workgroup("build/untouched.wasm", 4);
             console.log("created workers!");
 
+            ctx.drawImage(image,0,0);
+            let imageData = ctx.getImageData(0,0,640,480);
+            let size = Math.min(imageData.width*imageData.height*4,1024*1024*1024);
+            
             // allocate shared memory for work
             let buffer = workgroup.allocate(size); console.log(buffer);
             let map = workgroup.map(buffer);
