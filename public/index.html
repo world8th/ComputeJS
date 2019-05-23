@@ -27,11 +27,11 @@
             let size = Math.min(imageData.width*imageData.height*4,1024*1024*1024);
             
 
-            //let computeSource = URL.createObjectURL(await (await fetch("src/compute.js")).blob());
+            //let computeSource = URL.createObjectURL(await (await fetch("./src/compute.js")).blob());
 
             // import compute library 
             //let compute = (await import(computeSource)).default;
-            let compute = (await import("./src/compute.mjs")).default;
+            let compute = (await import("./src/compute.js")).default;
 
             // initialize compute framework
             //await compute.init();
