@@ -27,8 +27,8 @@ export function main(threadID: u32, width: u32, height: u32, buffer: usize): usi
     for (let I: u32 = 0; I < size; I++) 
     //let I: u32 = 0;
     {
-        offset = (threadCount*I + threadID)*byteSize;
-        pixel = atomic.load<u32>(buffer+offset);
+        offset = (threadID*size+I)*byteSize; //(threadCount*I + threadID)*byteSize;
+        pixel = load<u32>(buffer+offset);
 
         // Get RGBA in Float32 format
         fr = (<f32>((pixel&0x000000FF)>>sh[0]))*<f32>(1.0/255.0);
@@ -46,8 +46,7 @@ export function main(threadID: u32, width: u32, height: u32, buffer: usize): usi
         pixel |= (<u32>(fa*<f32>(255.0)))<<sh[3];
 
         // Store that pixel
-        //store<u32>(buffer+offset, 0xFF000000);
-        atomic.store<u32>(buffer+offset, pixel);
+        store<u32>(buffer+offset, pixel);
 
         /*
         // load by SIMD WARP
