@@ -1,5 +1,5 @@
 
-let ThreadCode = `
+let ThreadCode = (support = ``)=>{ return `
 let instance = null, threads = 1, id = 0;
 //let table = new WebAssembly.Table({initial: 1, maximum: 65536, shared: true, element: "anyfunc"});
 
@@ -16,25 +16,30 @@ onmessage = async (e)=>{
 
         result = await instance.exports.init(threads);
     }
+    
     if (e.data.type == "dispatch") {
         result = await instance.exports[e.data.name](id, ...e.data.args);
+    }
+    
+    if (e.data.type == "support") {
+        result = ${support}(e.data);
     }
 
     postMessage(Object.assign(e.data, {result}));
 }
-`;
+`};
 
 class Workgroup {
     constructor(){
         
     }
     
-    async initiate(module, threads = 1){
+    async initiate(module, threads = 1, supportCode = ``){
         //WebAssembly.instantiateStreaming(fetch(
         this.workers = [];
 
         // initialize threads
-        let blob = new Blob([ThreadCode],{type:"text/javascript"}), url = URL.createObjectURL(blob);
+        let blob = new Blob([ThreadCode(supportCode)],{type:"text/javascript"}), url = URL.createObjectURL(blob);
         for (let i=0;i<threads;i++) { this.workers.push(new Worker(url)); }
 
         // 
@@ -133,13 +138,22 @@ class Worktask {
         return this.workgroup.wait(this.resp);
     }
 
+    // send command for javascript host manager
+    async support() {
+        ///return this.workgroup.instance.exports[this.name](0, ...this.args);
+        this.workgroup.workers.every(async (w,i)=>{
+            w.postMessage({ type: "support", id:i, response: this.resp, name: this.name, args: this.args });
+        });
+        return this.workgroup.wait(this.resp);
+    }
+
     // get task ID (not recommended)
     get id() { return this.resp; }
 }
 
 export default {
     async init() { return 0; },
-    async workgroup(module, threads = 1) {
-        return new Workgroup().initiate(module, threads);
+    async workgroup(module, threads = 1,support=``) {
+        return new Workgroup().initiate(module,threads,support);
     }
 };

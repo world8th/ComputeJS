@@ -32,7 +32,10 @@
             //await compute.init();
 
             // create wasm workgroup (4 threads) with module
-            let workgroup = await compute.workgroup("build/optimized.wasm", 6);
+            let workgroup = await compute.workgroup("build/optimized.wasm", 6, `
+                await (async (data)=>{
+                    return instance.exports[data.name](id, ...data.args);
+                })`);
             console.log("created workers!");
 
             ctx.drawImage(image,0,0);
@@ -48,11 +51,14 @@
             for (let i=0;i<size;i++) { map[i] = imageData.data[i]; };
             
             // create work task
-            let task = workgroup.task({name: "main", args: [imageData.width, imageData.height, buffer]});
-            console.log("compute task created!");
+            //let task = workgroup.task({name: "main", args: [imageData.width, imageData.height, buffer]});
+            //console.log("compute task created!");
 
             // dispatch compute for buffer
-            await task.dispatch();
+            //await task.dispatch();
+
+            // Run "support" task (can run "main" without input data)
+            await workgroup.task({name: "main", args: [imageData.width, imageData.height, buffer]}).support();
             console.log("compute done!");
 
             // set imageData by mapped memory
