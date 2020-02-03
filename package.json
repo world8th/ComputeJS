@@ -5,11 +5,22 @@
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   },
   "devDependencies": {
-    "eslint": "^5.16.0"
+    "eslint": "^5.16.0",
+    "@types/gl-matrix": "^2.4.5",
+    "@types/node": "^13.7.0",
+    "@webgpu/types": "0.0.19",
+    "http-server": "^0.12.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "assemblyscript": "^0.9.1",
     "eslint-config-airbnb-base": "^13.2.0",
-    "eslint-plugin-import": "^2.20.1"
+    "eslint-plugin-import": "^2.20.1",
+    "gl-matrix": "^3.1.0"
   }
 }

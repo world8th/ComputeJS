@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>WebGPU Compute 101 Demo</title>
+</head>
+
+<body>
+  <div id="not-supported" style="display: none">WebGPU not supported! Please visit <a href="//webgpu.io">webgpu.io</a> to see the current implementation status.</div>
+  Matrix dimension: <input id="dimension" type="text" value="512"/> <button onclick="benchmark()">Compute!</button>
+  <p>Status: <span id="status"></span></p>
+  <p>Correctness: <span id="correctness"></span></p>
+  <p>GPU Time: <span id="gputime"></span></p>
+  <p>CPU Time: <span id="cputime"></span></p>
+  <script>
+if (!navigator.gpu) {
+    document.getElementById('not-supported').style.display = 'block';
+}
+
+let matrixDimension = 1024;
+let matrixElements = matrixDimension * matrixDimension;
+
+// Not on the slides. Local size in X and Y. Without this the GPU will only run
+// one instance of the compute shader on a block of (for example) 32 ALUs,
+// wasting 31 of them.
+const localSize = 8;
+
+function yieldToBrowser() {
+    return new Promise(function(resolve, reject) {
+        setTimeout(function() {
+            resolve();
+        }, 0);
+    });
+}
+
+async function setStatus(message) {
+    document.getElementById('status').textContent = message;
+    await yieldToBrowser();
+}
+
+async function computeOnGPU(matrixA, matrixB) {
+    const glslangModule = await import('https://unpkg.com/@webgpu/glslang@0.0.7/web/glslang.js');
+    const glslang = await glslangModule.default();
+
+    await setStatus("Preparing for the GPU");
+
+    // Slide 1: Initialize WebGPU
+    const adapter = await navigator.gpu.requestAdapter();
+    const device = await adapter.requestDevice();
+
+    // Slide 2: Allocate memory for the matrix data.
+    const matrixSize = matrixDimension * matrixDimension * 4; // sizeof(float) == 4
+
+    const [gpuMatrixA, cpuMatrixA] = device.createBufferMapped({
+        size: matrixSize,
+        usage: GPUBufferUsage.STORAGE,
+    });
+
+    new Float32Array(cpuMatrixA).set(matrixA);
+    gpuMatrixA.unmap();
+
+    const [gpuMatrixB, cpuMatrixB] = device.createBufferMapped({
+        size: matrixSize,
+        usage: GPUBufferUsage.STORAGE,
+    });
+
+    new Float32Array(cpuMatrixB).set(matrixB);
+    gpuMatrixB.unmap();
+
+    const gpuMatrixC = device.createBuffer({
+        size: matrixSize,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+    });
+
+    // Layout things that are hidden
+    const bindGroupLayout = device.createBindGroupLayout({
+        bindings: [
+            {binding: 0, visibility: GPUShaderStage.COMPUTE, type: "storage-buffer"},
+            {binding: 1, visibility: GPUShaderStage.COMPUTE, type: "storage-buffer"},
+            {binding: 2, visibility: GPUShaderStage.COMPUTE, type: "storage-buffer"},
+        ],
+    });
+    const pipelineLayout = device.createPipelineLayout({
+        bindGroupLayouts: [bindGroupLayout],
+    });
+
+    // Slide 3: Create the data “group”.
+    const bindGroup = device.createBindGroup({
+        layout: bindGroupLayout,
+        bindings: [
+            {binding: 0, resource: {buffer: gpuMatrixA}},
+            {binding: 1, resource: {buffer: gpuMatrixB}},
+            {binding: 2, resource: {buffer: gpuMatrixC}},
+        ]
+    });
+
+    // Slide 4a: GPU program source.
+    const glslSource = `#version 450
+        layout(std430, set = 0, binding = 0) readonly buffer MatrixA {
+            float data[];
+        } A;
+        layout(std430, set = 0, binding = 1) readonly buffer MatrixB {
+            float data[];
+        } B;
+        layout(std430, set = 0, binding = 2) buffer MatrixC {
+            float data[];
+        } C;
+        layout(local_size_x = ${localSize}, local_size_y = ${localSize}) in;
+
+        void main() {
+            uvec2 resultCell = gl_GlobalInvocationID.xy;
+            uint resultIndex = resultCell.y + resultCell.x * ${matrixDimension};
+
+            float result = 0.0f;
+            for (uint i = 0; i < ${matrixDimension}; i++) {
+                uint aCell = i + resultCell.x * ${matrixDimension};
+                uint bCell = resultCell.y + i * ${matrixDimension};
+                result += A.data[aCell] * B.data[bCell];
+            }
+            C.data[resultIndex] = result;
+        }`;
+
+    const computeShaderCode = glslang.compileGLSL(glslSource, "compute");
+
+    // Slide 4b: Compile the GPU program.
+    const computePipeline = device.createComputePipeline({
+        layout: pipelineLayout,
+        computeStage: {
+            module: device.createShaderModule({
+                code: computeShaderCode
+            }),
+            entryPoint: "main"
+        }
+    });
+
+    // Slide 5: Encode the compute commands.
+    const commandEncoder = device.createCommandEncoder();
+
+    const passEncoder = commandEncoder.beginComputePass();
+    passEncoder.setPipeline(computePipeline);
+    passEncoder.setBindGroup(0, bindGroup);
+    passEncoder.dispatch(matrixDimension / localSize, matrixDimension / localSize);
+    passEncoder.endPass();
+
+    // Slide 6: Encode the readback commands.
+    const gpuReadBuffer = device.createBuffer({
+        size: matrixSize,
+        usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+    });
+
+    commandEncoder.copyBufferToBuffer(
+        gpuMatrixC, 0,
+        gpuReadBuffer, 0,
+        matrixSize
+    );
+
+    // Slide 7: Submit work to the GPU.
+    await setStatus("Computing on the GPU");
+    const timeBefore = window.performance.now();
+
+    const gpuCommands = commandEncoder.finish();
+    //console.log(device);
+    //device.getQueue().submit([gpuCommands]);
+    device.defaultQueue.submit([gpuCommands]);
+  
+    const cpuMatrixC = await gpuReadBuffer.mapReadAsync();
+
+    const elapsedTime = window.performance.now() - timeBefore;
+    await setStatus("GPU finished");
+
+    const resultArray = new ArrayBuffer(cpuMatrixC.byteLength);
+    const result = new Float32Array(resultArray);
+    result.set(new Float32Array(cpuMatrixC));
+
+    return [result, elapsedTime];
+}
+
+async function computeOnCPU(matrixA, matrixB) {
+    const resultArray = new ArrayBuffer(matrixA.length * 4);
+    const result = new Float32Array(resultArray);
+
+    const timeBefore = window.performance.now();
+    await setStatus("Computing on the GPU");
+
+    for (let resultX = 0; resultX < matrixDimension; resultX ++) {
+        for (let resultY = 0; resultY < matrixDimension; resultY ++) {
+            let sum = 0.0;
+
+            for (let i = 0; i < matrixDimension; i++) {
+                const aCell = i + resultX * matrixDimension;
+                const bCell = resultY + i * matrixDimension;
+                sum += matrixA[aCell] * matrixB[bCell];
+            }
+
+            const resultCell = resultY + resultX * matrixDimension;
+            result[resultCell] = sum;
+        }
+
+        if (resultX % 10 === 0) {
+            await setStatus("CPU computed row " + resultX);
+        }
+    }
+
+    const elapsedTime = window.performance.now() - timeBefore;
+    await setStatus("CPU finished");
+
+    return [result, elapsedTime];
+}
+
+function randomFloats(elementCount) {
+    const matrix = [];
+    for (let i = 0; i < elementCount; i++) {
+        matrix.push(Math.random() * 10);
+    }
+    return matrix;
+}
+
+async function benchmark() {
+    matrixDimension = document.getElementById("dimension").value;
+    matrixElements = matrixDimension * matrixDimension;
+    if (matrixDimension > 2048) {alert("don't push it!"); return;}
+
+    document.getElementById("correctness").textContent = "";
+
+    const matrixA = randomFloats(matrixElements);
+    const matrixB = randomFloats(matrixElements);
+
+    const [gpuResult, gpuTime] = await computeOnGPU(matrixA, matrixB);
+    document.getElementById("gputime").textContent = (gpuTime / 1000).toFixed(3) + "s";
+
+    const [cpuResult, cpuTime] = await computeOnCPU(matrixA, matrixB);
+    document.getElementById("cputime").textContent = (cpuTime / 1000).toFixed(3) + "s";
+
+    await setStatus("Computing correctness");
+
+    let correct = true;
+    for (let i = 0; i < matrixElements; i++) {
+        if (Math.abs(1.0 - (gpuResult[i] / cpuResult[i])) > 0.00001) {
+            correct = false;
+        }
+    }
+
+    if (correct) {
+        document.getElementById("correctness").textContent = "Computations match!";
+    } else {
+        document.getElementById("correctness").textContent = "Computations don't match (float addition issue?)";
+    }
+    await setStatus("Done");
+}
+  </script>
+</body>
+</html>
