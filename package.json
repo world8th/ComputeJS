@@ -18,6 +18,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "serialize-javascript": "^2.1.2",
     "assemblyscript": "^0.9.1",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.20.1",
