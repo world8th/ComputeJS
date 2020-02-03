@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.17.2"
+    "eslint-plugin-import": "^2.17.2",
+    "assemblyscript": "^0.9.1"
   }
 }
