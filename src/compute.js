@@ -61,11 +61,11 @@ class Workgroup {
 
         this.workers.every(async (w,i)=>{
             w.responses = {};
-            w.onmessage = (e)=>{ w.responses[e.data.response].resolved = e.data; }
+            w.onmessage = (e)=>{ w.responses[e.data.response].resolved = e.data; };
 
             // add new task into worker
             let response = {}; w.responses[resp] = response; // initialize resolver
-            this.responses[resp][i] = new Promise((resolve,reject)=>{ Object.defineProperty(response, "resolved", {set: value => { value?resolve(value):reject() }}); });
+            this.responses[resp][i] = new Promise((resolve,reject)=>{ Object.defineProperty(response, "resolved", {set: value => { value?resolve(value):reject(); }}); });
 
             // send command into worker
             w.postMessage({ response: resp, type: "init", module: this.module, memory: this.memory, threads, id: i });
@@ -93,8 +93,8 @@ class Workgroup {
         // add new task into worker
         this.workers.every(async (w,i)=>{
             let response = {}; w.responses[resp] = response; // initialize resolver
-            this.responses[resp][i] = new Promise((resolve,reject)=>{ Object.defineProperty(response, "resolved", {set: value => { value?resolve(value):reject() }}); });
-        })
+            this.responses[resp][i] = new Promise((resolve,reject)=>{ Object.defineProperty(response, "resolved", {set: value => { value?resolve(value):reject(); }}); });
+        });
 
         return new Worktask({name,args,resp,workgroup:this});
     }
@@ -110,9 +110,12 @@ class Workgroup {
     }
 
     // get workgroup memory object 
-    map(ptr){
-        //let lengthPtr = new Uint32Array(this.instance.exports.memory.buffer,ptr-4,1);
-        return new Uint8Array(this.instance.exports.memory.buffer,ptr/*,lengthPtr[0]/Uint8Array.BYTES_PER_ELEMENT*/);
+    map(ptr, type = Uint8Array, range = 0){
+        if (range) {
+            return new type(this.instance.exports.memory.buffer, ptr, range); // Ranged
+        } else {
+            return new type(this.instance.exports.memory.buffer, ptr); // Whole Size (may used for WebGPU)
+        }
     }
 }
 
