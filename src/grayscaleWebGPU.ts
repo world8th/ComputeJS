@@ -38,33 +38,29 @@ import { Compute } from "../build/lib/compute.js";
     // 
     console.log("Compute Ready");
 
-    // 
-    ctx.drawImage(image,0,0);
-
-    // Compute ONLY test, without swapchain context
-    let imageData = ctx.getImageData(0,0,640,480);
-    let size = Math.min(imageData.width*imageData.height*4,1024*1024*1024);
-
-    // Firefox supported
-    //const [dataBuffer, dataMap] = device.createBufferMapped({ size, usage: GPUBufferUsage.COPY_SRC | GPUBufferUsage.MAP_WRITE });
-    //new Uint8Array(dataMap).set(imageData.data);
-
-    // Chrome Stable, planned for NodeJS
-    const dataBuffer = device.createBuffer({ size, usage: GPUBufferUsage.COPY_SRC | GPUBufferUsage.MAP_WRITE });
-    const readBuffer = device.createBuffer({ size, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
-    new Uint8Array(await dataBuffer.mapWriteAsync()).set(imageData.data);
-    dataBuffer.unmap();
-
-    // 
+    //const size = Math.min(imageData.width*imageData.height*4,1024*1024*1024);
+    const size = Math.min(canvas.width*canvas.height*4,1024*1024*1024);
     const gpuBuffer = device.createBuffer({ size, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST });
-
-    // 
     const bindGroup = device.createBindGroup({
         layout: bindGroupLayout,
         bindings: [
             { binding: 0, resource: { buffer: gpuBuffer } }
         ]
     });
+
+    // Compute ONLY test, without swapchain context
+    // Chrome Stable, planned for NodeJS
+    const dataBuffer = device.createBuffer({ size, usage: GPUBufferUsage.COPY_SRC | GPUBufferUsage.MAP_WRITE });
+    const readBuffer = device.createBuffer({ size, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+    const mapData = dataBuffer.mapWriteAsync(); // get lazy promise
+
+    // 
+    ctx.drawImage(image,0,0); // draw image while mapping in progress
+    
+    // 
+    const imgData = ctx.getImageData(0,0,canvas.width,canvas.height).data; // while mapping in progress
+    new Uint8Array(await mapData).set(imgData);
+    dataBuffer.unmap();
 
     // 
     const commandEncoder = device.createCommandEncoder();
@@ -88,12 +84,9 @@ import { Compute } from "../build/lib/compute.js";
 
     // 
     console.log("Copying from GPU");
-    imageData.data.set(new Uint8Array(await readBuffer.mapReadAsync(), 0, size));
-    readBuffer.unmap();
 
-    // 
+    // put imageData into canvas
+    ctx.putImageData(new ImageData(new Uint8ClampedArray(await readBuffer.mapReadAsync(),0,size), canvas.width, canvas.height),0,0);
     console.log("Sot ImageData");
-
-    // put imageData
-    ctx.putImageData(imageData,0,0);
+    readBuffer.unmap();
 })();
