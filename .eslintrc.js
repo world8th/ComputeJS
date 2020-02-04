@@ -3,7 +3,8 @@ module.exports = {
         "browser": true,
         "es6": true,
         "es2017": true,
-        "es2020": true
+        "es2020": true,
+        "worker": true
     },
     "extends": "eslint:recommended",
     "globals": {
