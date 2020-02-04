@@ -1,5 +1,7 @@
 /// <reference path="../build/lib/compute.d.ts" />
 
+import { Compute } from "../build/lib/compute.js";
+
 (async ()=>{
     let canvas: HTMLCanvasElement = document.querySelector("#canvas");
     let ctx = canvas.getContext("2d");
@@ -15,7 +17,7 @@
 
     // import compute library 
     let compute: Compute.Module = (await import("./lib/compute.js")).default; // Required Type Conversion
-
+    
     // create wasm workgroup (4 threads) with module
     let workgroup = await compute.workgroup("./build/assembly/optimized.wasm", 6, `
         await (async (data)=>{

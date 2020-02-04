@@ -1,4 +1,4 @@
-declare namespace Compute {
+export declare namespace Compute {
     interface Workgroup{}
     interface Worktask{}
     interface TaskInterface {
@@ -30,3 +30,5 @@ declare namespace Compute {
         workgroup(module:string,threads?:number,supportCode?:string): Promise<Workgroup>;
     }
 }
+
+export default Module;
