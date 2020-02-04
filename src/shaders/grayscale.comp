@@ -1,0 +1,16 @@
+#version 320 es
+
+layout (local_size_x = 128) in;
+layout (std430, set = 0, binding = 0) buffer ImageData {
+    uint data[];
+} pixel;
+
+void main(){
+    vec4 rgba = unpackUnorm4x8(pixel.data[gl_GlobalInvocationID.x]);
+    float gray = dot(rgba.xyz,vec3(1.f/3.f)); rgba.xyz = vec3(gray);
+    pixel.data[gl_GlobalInvocationID.x] = packUnorm4x8(rgba);
+}
+
+// WebGPU version of same program with AssemblyScript (threaded WASM still can't be for GPU)
+// So I used GLSL for OpenGL ES 3.2
+// 
