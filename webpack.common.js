@@ -4,10 +4,10 @@ module.exports = {
 	mode: 'development',
 	context: path.join(__dirname, 'src'),
 	entry: {
-		app: './main.ts'
+		app: './webgpu.ts'
 	},
 	output: {
-		filename: 'main.js',
+		filename: 'webgpu.js',
 		path: path.resolve(__dirname, 'build')
 	},
 	resolve: {
