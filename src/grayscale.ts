@@ -25,29 +25,24 @@ import { Compute } from "../build/lib/compute.js";
         })`);
     console.log("created workers!");
 
+    // allocate shared memory for work
+    const size = Math.min(canvas.width*canvas.height*4,1024*1024*1024);
+    const buffer = workgroup.allocate(size); // just number pointer
+
     // 
     ctx.drawImage(image,0,0);
 
-    //
-    let imageData = ctx.getImageData(0,0,640,480);
-    let size = Math.min(imageData.width*imageData.height*4,1024*1024*1024);
-
-    // allocate shared memory for work
-    let buffer = workgroup.allocate(size); // just number pointer
-
     // make typed array and set with image data 
-    let map = workgroup.map<Uint8Array>(buffer,size,Uint8Array);
-    map.set(imageData.data); // set by mapped range
+    let map = workgroup.map<Uint8ClampedArray>(buffer,size,Uint8ClampedArray);
+    let img = ctx.getImageData(0,0,canvas.width,canvas.height);
+    map.set(img.data); // set by mapped range
     console.log("allocation of shared memory complete!");
 
     // Run "support" task (can run "main" without input data)
-    await workgroup.task({name: "main", args: [imageData.width, imageData.height, buffer]}).support();
+    await workgroup.task({name: "main", args: [canvas.width, canvas.height, buffer]}).support();
     console.log("compute done!");
 
-    // set imageData by mapped memory
-    imageData.data.set(map);
-    console.log(`copied back data with ${size} bytes!`);
-
     // put imageData
-    ctx.putImageData(imageData,0,0);
+    img.data.set(map);
+    ctx.putImageData(img,0,0);
 })();
