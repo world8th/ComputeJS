@@ -70,7 +70,7 @@ import { Compute } from "../build/lib/compute.js";
     const passEncoder = commandEncoder.beginComputePass();
     passEncoder.setPipeline(computePipeline);
     passEncoder.setBindGroup(0, bindGroup);
-    passEncoder.dispatch(size>>9,1,1);
+    passEncoder.dispatch(size>>7,1,1);
     passEncoder.endPass();
     
     // read from GPU to cache
