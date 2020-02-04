@@ -1184,114 +1184,129 @@
   i32.load
  )
  (func $src/assembly/index/main (; 19 ;) (param $0 i32) (param $1 i32) (param $2 i32) (param $3 i32) (result i32)
-  (local $4 f32)
+  (local $4 v128)
   (local $5 i32)
-  (local $6 i32)
-  (local $7 f32)
-  (local $8 f32)
-  (local $9 f32)
+  (local $6 v128)
+  (local $7 v128)
+  (local $8 v128)
   local.get $1
   local.get $2
   i32.mul
   global.get $src/assembly/index/threadCount
+  i32.const 2
+  i32.shl
   i32.div_u
   local.set $2
+  i32.const 0
+  local.set $1
   loop $for-loop|0
-   local.get $5
+   local.get $1
    local.get $2
    i32.lt_u
    if
-    local.get $0
-    local.get $2
+    global.get $src/assembly/index/threadCount
+    local.get $1
     i32.mul
-    local.get $5
+    local.get $0
     i32.add
-    i32.const 2
+    i32.const 4
     i32.shl
     local.get $3
     i32.add
-    local.tee $1
-    i32.load
-    local.tee $6
+    local.tee $5
+    v128.load
+    local.tee $4
     i32.const 255
-    i32.and
-    i32.const 0
-    call $~lib/array/Array<i32>#__get
-    i32.shr_u
-    f32.convert_i32_u
+    i32x4.splat
+    v128.and
+    f32x4.convert_i32x4_u
     f32.const 0.003921568859368563
-    f32.mul
-    local.set $7
-    local.get $6
+    f32x4.splat
+    f32x4.mul
+    local.set $6
+    local.get $4
     i32.const 65280
-    i32.and
+    i32x4.splat
+    v128.and
     i32.const 1
     call $~lib/array/Array<i32>#__get
-    i32.shr_u
-    f32.convert_i32_u
+    i32x4.shr_u
+    f32x4.convert_i32x4_u
     f32.const 0.003921568859368563
-    f32.mul
-    local.set $8
-    local.get $6
+    f32x4.splat
+    f32x4.mul
+    local.set $7
+    local.get $4
     i32.const 16711680
-    i32.and
+    i32x4.splat
+    v128.and
     i32.const 2
     call $~lib/array/Array<i32>#__get
-    i32.shr_u
-    f32.convert_i32_u
+    i32x4.shr_u
+    f32x4.convert_i32x4_u
     f32.const 0.003921568859368563
-    f32.mul
-    local.set $4
-    local.get $6
+    f32x4.splat
+    f32x4.mul
+    local.set $8
+    local.get $5
+    local.get $4
     i32.const -16777216
-    i32.and
+    i32x4.splat
+    v128.and
     i32.const 3
     call $~lib/array/Array<i32>#__get
-    i32.shr_u
-    f32.convert_i32_u
+    i32x4.shr_u
+    f32x4.convert_i32x4_u
     f32.const 0.003921568859368563
-    f32.mul
-    local.set $9
-    local.get $1
+    f32x4.splat
+    f32x4.mul
+    f32.const 255
+    f32x4.splat
+    f32x4.mul
+    i32x4.trunc_sat_f32x4_u
+    i32.const 3
+    call $~lib/array/Array<i32>#__get
+    i32x4.shl
+    local.get $6
     local.get $7
     local.get $8
-    f32.add
-    local.get $4
-    f32.add
+    f32x4.add
+    f32x4.add
     f32.const 0.3333333432674408
-    f32.mul
-    f32.const 255
-    f32.mul
+    f32x4.splat
+    f32x4.mul
     local.tee $4
-    i32.trunc_f32_u
+    f32.const 255
+    f32x4.splat
+    f32x4.mul
+    i32x4.trunc_sat_f32x4_u
     i32.const 0
     call $~lib/array/Array<i32>#__get
-    i32.shl
+    i32x4.shl
+    v128.or
     local.get $4
-    i32.trunc_f32_u
+    f32.const 255
+    f32x4.splat
+    f32x4.mul
+    i32x4.trunc_sat_f32x4_u
     i32.const 1
     call $~lib/array/Array<i32>#__get
-    i32.shl
-    i32.or
+    i32x4.shl
+    v128.or
     local.get $4
-    i32.trunc_f32_u
+    f32.const 255
+    f32x4.splat
+    f32x4.mul
+    i32x4.trunc_sat_f32x4_u
     i32.const 2
     call $~lib/array/Array<i32>#__get
-    i32.shl
-    i32.or
-    local.get $9
-    f32.const 255
-    f32.mul
-    i32.trunc_f32_u
-    i32.const 3
-    call $~lib/array/Array<i32>#__get
-    i32.shl
-    i32.or
-    i32.store
-    local.get $5
+    i32x4.shl
+    v128.or
+    v128.store
+    local.get $1
     i32.const 1
     i32.add
-    local.set $5
+    local.set $1
     br $for-loop|0
    end
   end
