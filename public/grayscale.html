@@ -19,20 +19,20 @@
                 image.onload=resolve;
                 image.onerror=reject;
             });
-            image.src = "images/test.png";
+            image.src = "assets/images/test.png";
             await promise;
 
             //let computeSource = URL.createObjectURL(await (await fetch("./src/compute.js")).blob());
 
             // import compute library 
             //let compute = (await import(computeSource)).default;
-            let compute = (await import("./src/compute.js")).default;
+            let compute = (await import("./build/compute.js")).default;
 
             // initialize compute framework
             //await compute.init();
 
             // create wasm workgroup (4 threads) with module
-            let workgroup = await compute.workgroup("build/optimized.wasm", 6, `
+            let workgroup = await compute.workgroup("build/assembly/optimized.wasm", 6, `
                 await (async (data)=>{
                     return instance.exports[data.name](id, ...data.args);
                 })`);

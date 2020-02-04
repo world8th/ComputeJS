@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "target": "es2020", /* TODO: "esnext" in late of 2020 */
+        "lib": [
+            "dom",
+            "es5",
+            "es6",
+            "es7",
+            "es2015",
+            "es2016",
+            "es2017",
+            "es2019",
+            "es2020"
+        ],
+        "module": "commonjs",
+        "declaration": false,
+        "noImplicitAny": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "noEmitHelpers": false,
+        "sourceMap": true,
+        "strictNullChecks": false,
+        "jsx": "react",
+        "allowSyntheticDefaultImports": true
+    }
+}

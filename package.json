@@ -1,8 +1,11 @@
 {
   "scripts": {
-    "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --sourceMap --validate --debug    --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd",
-    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --sourceMap --validate --optimize --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd",
-    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+    "asbuild:untouched": "asc src/assembly/index.ts -b build/assembly/untouched.wasm -t build/assembly/untouched.wat --sourceMap --validate --debug    --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd",
+    "asbuild:optimized": "asc src/assembly/index.ts -b build/assembly/optimized.wasm -t build/assembly/optimized.wat --sourceMap --validate --optimize --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
+    "start": "npm i && npm run build && npm run dev",
+    "dev": "http-server",
+    "build": "webpack --config webpack.prod.js"
   },
   "devDependencies": {
     "eslint": "^5.16.0",
@@ -15,13 +18,13 @@
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "eslint-config-airbnb-base": "^13.2.0",
+    "eslint-plugin-import": "^2.20.1"
   },
   "dependencies": {
     "serialize-javascript": "^2.1.2",
     "assemblyscript": "^0.9.1",
-    "eslint-config-airbnb-base": "^13.2.0",
-    "eslint-plugin-import": "^2.20.1",
     "gl-matrix": "^3.1.0"
   }
 }
