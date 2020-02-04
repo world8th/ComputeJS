@@ -1,13 +1,11 @@
 const path = require('path');
+const webgpu = "webgpu", grayscale = "grayscale";
 
-module.exports = {
+module.exports = (entry = {[webgpu]: `./${webgpu}.ts`, [grayscale]: `./${grayscale}.ts`}) => { return {
 	mode: 'development',
-	context: path.join(__dirname, 'src'),
-	entry: {
-		app: './webgpu.ts'
-	},
+	context: path.join(__dirname, 'src'), entry,
 	output: {
-		filename: 'webgpu.js',
+		filename: `[name].js`,
 		path: path.resolve(__dirname, 'build')
 	},
 	resolve: {
@@ -26,4 +24,4 @@ module.exports = {
 			}
 		]
 	}
-};
+};};
