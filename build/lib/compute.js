@@ -115,7 +115,7 @@ class Workgroup {
     }
 
     // get workgroup memory object 
-    map(ptr, type = Uint8Array, range = 0){
+    map(ptr, range = 0, type = Uint8Array){
         if (range) {
             return new type(this.instance.exports.memory.buffer, ptr, range); // Ranged
         } else {
