@@ -10,12 +10,12 @@ declare namespace Compute {
 
     class Workgroup {
         constructor();
-        initiate(module:string,threads?:number,supportCode?:string) : Promise<Workgroup>;
-        wait(resp: Promise<any>) : Promise<Workgroup>;
-        task(input?:TaskInterface) : Worktask;
-        allocate(size?:number) : number;
-        free(pointer:number) : any;
-        map<T=Uint8Array>(ptr:number,range?:number,type?:new(arrayBuffer?:ArrayBuffer,offset?:number,range?:number)=>T) : T;
+        initiate(module:string,threads?:number,supportCode?:string): Promise<Workgroup>;
+        wait(resp: Promise<any>): Promise<Workgroup>;
+        task(input?:TaskInterface): Worktask;
+        allocate(size?:number): number;
+        free(pointer:number): any;
+        map<T=Uint8Array>(ptr:number,range?:number,type?:new(arrayBuffer?:ArrayBuffer,offset?:number,range?:number)=>T): T;
     }
 
     class Worktask {
@@ -26,7 +26,7 @@ declare namespace Compute {
     }
 
     interface Module {
-        init() : Promise<any>;
-        workgroup(module:string,threads?:number,supportCode?:string) : Promise<Workgroup>;
+        init(): Promise<any>;
+        workgroup(module:string,threads?:number,supportCode?:string): Promise<Workgroup>;
     }
 }
