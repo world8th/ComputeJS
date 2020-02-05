@@ -56,7 +56,7 @@ import { Compute } from "../build/lib/compute.js";
 
     // 
     ctx.drawImage(image,0,0); // draw image while mapping in progress
-    
+
     // 
     const imgData = ctx.getImageData(0,0,canvas.width,canvas.height).data; // while mapping in progress
     new Uint8Array(await mapData).set(imgData);
@@ -70,9 +70,9 @@ import { Compute } from "../build/lib/compute.js";
     const passEncoder = commandEncoder.beginComputePass();
     passEncoder.setPipeline(computePipeline);
     passEncoder.setBindGroup(0, bindGroup);
-    passEncoder.dispatch(size>>7,1,1);
+    passEncoder.dispatch(size>>9,1,1);
     passEncoder.endPass();
-    
+
     // read from GPU to cache
     commandEncoder.copyBufferToBuffer(gpuBuffer, 0, readBuffer, 0, size);
 
