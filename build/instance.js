@@ -1,0 +1,1 @@
+../public/instance.js

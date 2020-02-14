@@ -10,76 +10,114 @@ let win = new VulkanWindow({
 });
 */
 
-//export declare namespace VK {
-    export declare function vkCreateInstance(instanceInfo:usize, allocator:u64, pointerToInstance:u64): u32;
-    export declare function vkEnumerateInstanceLayerProperties(amount:u64,layerProperties:u64): u32;
-    export declare function mUSizePtr(local: usize): u64;
-    export declare function mInt64Ptr(local: u64  ): u64;
-//};
-
-function ptr(local: usize): u64 { return mUSizePtr(local); }
-
+// 
 function VK_MAKE_VERSION(major:u32, minor:u32, patch:u32): u32 { return (((major) << 22) | ((minor) << 12) | (patch)); };
 let VK_API_VERSION_1_0: u32 = VK_MAKE_VERSION(1, 0, 0);
 let VK_API_VERSION_1_1: u32 = VK_MAKE_VERSION(1, 1, 0);
 
+// 
+type gptr_t = u64;
+type lptr_t = usize;
+type VkResult = u32;
+
+
+@external("env", "vkCreateInstance")
+declare function vkCreateInstance(instanceInfo: lptr_t, allocator: lptr_t, pointerToInstance: lptr_t): VkResult;
+
+@external("env", "vkEnumerateInstanceLayerProperties")
+declare function vkEnumerateInstanceLayerProperties(amount: lptr_t, layerProperties: lptr_t): VkResult;
+
+//@external("env", "mUSizePtr")
+//declare function mUSizePtr(local: usize): gptr_t;
+
+//@external("env", "mInt64Ptr")
+//declare function mInt64Ptr(local: u64): gptr_t;
+
+@external("env", "memoryAddress")
+declare var memoryAddress: usize;
+
+// 
+function mUSizePtr(local: usize): gptr_t {
+    return memoryAddress + <u64>local;
+};
+
+// 
+//function ptr(local: usize): gptr_t { return mUSizePtr(local); }
+//function ptr(local: usize): lptr_t { return local; }
+
+
+// 
 class VkInstance { handle: u64; }; // XPEH-TB
+
+// 
 class VkApplicationInfo {
     sType: u32;
-    pNext: u64;
-    pApplicationName: u64;
+    pNext: gptr_t;
+    pApplicationName: gptr_t;
     applicationVersion: u32;
-    pEngineName: u64;
+    pEngineName: gptr_t;
     engineVersion: u32;
     apiVersion: u32;
 };
 
+// 
 class VkInstanceCreateInfo {
     sType: u32;
-    pNext: u64;
+    pNext: gptr_t;
     flags: u32;
-    pApplicationInfo: u64;
+    pApplicationInfo: gptr_t;
     enabledLayerCount: u32;
-    ppEnabledLayerNames: u64;
+    ppEnabledLayerNames: gptr_t;
     enabledExtensionCount: u32;
-    ppEnabledExtensionNames: u64;
+    ppEnabledExtensionNames: gptr_t;
 };
 
+// 
 class VkLayerProperties {
-    layerName: u64;
+    layerName: gptr_t;
     specVersion: u32;
     implementationVersion: u32;
     description: u64;
 };
 
-let instance = new VkInstance();
+// 
+let instance: VkInstance = {handle: 0};
+let applicationName = Uint8Array.wrap(String.UTF8.encode("App Game"));
+let engineName = Uint8Array.wrap(String.UTF8.encode("No Engine"));
+
+// 
 let appInfo: VkApplicationInfo = {
     sType: 0,
     pNext: 0,
-    pApplicationName: ptr(changetype<usize>(String.UTF8.encode("Hello!"))),
+    pApplicationName: mUSizePtr(changetype<lptr_t>(applicationName)),
     applicationVersion: VK_MAKE_VERSION(1, 0, 0),
-    pEngineName: ptr(changetype<usize>(String.UTF8.encode("No Engine"))),
+    pEngineName: mUSizePtr(changetype<lptr_t>(engineName)),
     engineVersion: VK_MAKE_VERSION(1, 0, 0),
     apiVersion: VK_API_VERSION_1_0
 };
 
-let validationLayers: u64[] = [];
-let instanceExtensions: u64[] = [];
+// 
+let validationLayers  : Array<gptr_t> = [ <gptr_t>changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_LAYER_KHRONOS_validation"))) ];
+let instanceExtensions: Array<gptr_t> = [ ];
 let instanceInfo: VkInstanceCreateInfo = {
     sType: 1,
     pNext: 0,
-    pApplicationInfo: 0,//changetype<usize>(appInfo),
+    flags: 0,
+    pApplicationInfo: mUSizePtr(changetype<lptr_t>(appInfo)),
     enabledLayerCount: validationLayers.length,
-    ppEnabledLayerNames: ptr(changetype<usize>(validationLayers)),
+    ppEnabledLayerNames: mUSizePtr(changetype<lptr_t>(validationLayers)),
     enabledExtensionCount: instanceExtensions.length,
-    ppEnabledExtensionNames: ptr(changetype<usize>(instanceExtensions))
+    ppEnabledExtensionNames: mUSizePtr(changetype<lptr_t>(instanceExtensions))
 };
 
-let result = vkCreateInstance(changetype<usize>(instanceInfo), 0, ptr(changetype<usize>(instance)));
+
+let result = vkCreateInstance(changetype<lptr_t>(instanceInfo), 0, changetype<lptr_t>(instance));
 if (result !== 0) throw `Failed to create VkInstance!`;
 
 
+/*
 let amountOfLayers: u32 = 0;
-vkEnumerateInstanceLayerProperties(ptr(changetype<usize>(amountOfLayers)), 0);
+vkEnumerateInstanceLayerProperties(changetype<lptr_t>(amountOfLayers), 0);
 let layers: VkLayerProperties[] = new Array<VkLayerProperties>(amountOfLayers);
-vkEnumerateInstanceLayerProperties(ptr(changetype<usize>(amountOfLayers)), ptr(changetype<usize>(layers)));
+vkEnumerateInstanceLayerProperties(changetype<lptr_t>(amountOfLayers), changetype<lptr_t>(layers));
+*/

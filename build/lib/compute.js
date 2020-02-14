@@ -1,8 +1,8 @@
-const { Worker, isMainThread, parentPort, workerData } = typeof require != "undefined" ? require('worker_threads') : { Worker: global.Worker, isMainThread: true, parentPort: this, workerData: {} };
+//const { Worker, isMainThread, parentPort, workerData } = typeof require != "undefined" ? require('worker_threads') : { Worker: global.Worker, isMainThread: true, parentPort: this, workerData: {} };
 //const fetch = typeof require != "undefined" ? require('node-fetch') : global.fetch;
 //const Blob  = typeof require != "undefined" ? require('cross-blob') : global.Blob;
-let fs;
-if (typeof require != "undefined") fs = require("fs");
+//let fs;
+//if (typeof require != "undefined") fs = require("fs");
 
 let ThreadCode = (support = ``)=>{ return `
 let instance = null, threads = 1, id = 0;
@@ -64,7 +64,7 @@ class Workgroup {
         // initialize workers
         try {
             if (typeof fetch != "undefined") this.moduleFetch = await (await fetch(module)).arrayBuffer();
-            if (typeof fetch == "undefined") this.moduleFetch = fs.readFileSync(module).buffer;
+            //if (typeof fetch == "undefined") this.moduleFetch = fs.readFileSync(module).buffer;
         } catch(e) {
             console.error(e);
         }

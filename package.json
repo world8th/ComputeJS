@@ -9,7 +9,7 @@
     "start": "npm i && npm run build && npm run dev",
     "dev": "http-server",
     "build": "webpack --config webpack.prod.js",
-    "pukan": "ts-node ./public/instance.ts --experimental-wasm-anyref --experimental-wasm-bigint --experimental-wasm-bulk-memory --experimental-wasm-eh --experimental-wasm-mv --experimental-wasm-return-call --experimental-wasm-sat-f2i-conversions --experimental-wasm-se --experimental-wasm-simd --experimental-wasm-threads --experimental-wasm-type-reflection"
+    "pukan": "npm run vkbuild && node ./public/instance.js --experimental-wasm-anyref --experimental-wasm-bigint --experimental-wasm-bulk-memory --experimental-wasm-eh --experimental-wasm-mv --experimental-wasm-return-call --experimental-wasm-sat-f2i-conversions --experimental-wasm-se --experimental-wasm-simd --experimental-wasm-threads --experimental-wasm-type-reflection"
   },
   "devDependencies": {
     "@types/gl-matrix": "^2.4.5",

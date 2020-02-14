@@ -1,8 +1,11 @@
 /// <reference path="../build/lib/compute.d.ts" />
 
-import { Compute } from "../build/lib/compute.js";
+//import { Compute } from "../build/lib/compute.js";
 import * as nvk from "nvk";
 Object.assign(global, nvk);
+
+type gptr_t = bigint;
+type lptr_t = number;
 
 (async ()=>{
     Object.assign(this, nvk);
@@ -57,31 +60,24 @@ Object.assign(global, nvk);
 
     // safer import (try use Vulkan bindings in WebAssembly with AssemblyScript)
     const VK = {
-        mInt64Ptr: (localAddress: bigint): bigint => {
-            //console.log(localAddress);
-            let ptr = globalify(memory.buffer, localAddress);
-            //console.log(ptr);
-            return ptr;
-        },
-
         mUSizePtr: (localAddress: number): bigint => {
-            //console.log(localAddress);
-            let ptr = globalify(memory.buffer, BigInt(localAddress));
-            //console.log(ptr);
-            return ptr;
+            return globalify(memory.buffer, BigInt(localAddress));
         },
 
-        vkCreateInstance: (instanceCreateInfoAddress: number, allocatorAddress: bigint, instancePointerAddress: bigint): number => { // will skipe pointer instance directly into...
+        mInt64Ptr: (localAddress: bigint): bigint => {
+            return globalify(memory.buffer, localAddress);
+        },
+
+        vkCreateInstance: (instanceCreateInfoAddress: lptr_t, allocatorAddress: gptr_t, instancePointerAddress: gptr_t): number => { // will skipe pointer instance directly into...
             console.log(`vkCreateInstance(${instanceCreateInfoAddress}, ${allocatorAddress}, ${instancePointerAddress})`);
             
             let createInfo: nvk.VkInstanceCreateInfo = new nvk.VkInstanceCreateInfo({$memoryBuffer:memory.buffer, $memoryOffset:instanceCreateInfoAddress});
-            
             
             console.log(`VkInstanceCreateInfo {
                 sType: ${createInfo.sType};
                 pNext: ${createInfo.pNext};
                 flags: ${createInfo.flags};
-                pApplicationName: ${createInfo.pApplicationInfo};
+                pApplicationInfo: ${createInfo.pApplicationInfo};
                 enabledLayerCount: ${createInfo.enabledLayerCount};
                 ppEnabledLayerNames: ${createInfo.ppEnabledLayerNames};
                 enabledExtensionCount: ${createInfo.enabledExtensionCount};
@@ -97,29 +93,30 @@ Object.assign(global, nvk);
 
             return nvk.vkCreateInstance(new nvk.VkInstanceCreateInfo({$memoryBuffer:memory.buffer, $memoryOffset:instanceCreateInfoAddress}), allocatorAddress, new nvk.VkInstance({$memoryBuffer:memory.buffer, $memoryOffset:instancePointerAddress}));
         },
-        vkEnumerateInstanceLayerProperties: (amountOfLayersAddress: bigint, layerPropertiesAddress: bigint): number =>{
+        
+        vkEnumerateInstanceLayerProperties: (amountOfLayersAddress: gptr_t, layerPropertiesAddress: gptr_t): number =>{
             return 0;
             //return nvk.vkEnumerateInstanceLayerProperties({$:new Uint32Array(memory.buffer,amountOfLayersAddress,1)}, nvk.VkLayerProperties({$memoryBuffer:memory.buffer, $memoryOffset:layerPropertiesAddress}));
         }
     };
 
     // oh, sh&t
-    const fs = require("fs"), code = fs.readFileSync("./build/assembly/pukan-opt.wasm"); 
+    const fs = require("fs"), code = fs.readFileSync("./build/assembly/pukan-unt.wasm"); 
     //console.log(code ? "Has Module" : "Something Wrong (Oh, SH&T!)"); if (code) console.log(code);
     
     // 
     let module = null;
     try { module = await WebAssembly.compile(code); } catch(e) { console.error(e); }
 
-    const imports = {
-        pukan: VK,
-        env: Object.assign({ memory, abort: function() { throw Error("abort called"); } })
-    };// as Record<string, Record<string, WebAssembly.ImportValue>>;
+    // 
+    let pukan = {}, env = Object.assign(
+        { memory, abort: function() { throw Error("abort called"); }, ...VK }, 
+    );
 
     // create host/manager instance
     //const vmodule = await WebAssembly.instantiate(module, imports as Record<string, Record<string, WebAssembly.ImportValue>>);
     let cmodule = null, vmodule = null;
-    try { cmodule = WebAssembly.instantiate(module, imports); } catch(e) { console.error(e); };
+    try { cmodule = WebAssembly.instantiate(module, {env}); } catch(e) { console.error(e); };
     try { vmodule = module ? (await cmodule) : { exports: {} }; } catch(e) { console.error(e); };
 
 })();

@@ -1,5 +1,5 @@
 const path = require('path');
-const webgpu = `webgpu`, grayscale = `grayscale`, grayscaleWG = `grayscaleWG`;
+const webgpu = `webgpu`, grayscale = `grayscale`, grayscaleWG = `grayscaleWG`, instance = `instance`;
 
 module.exports = (entry = {[webgpu]: `./${webgpu}.ts`, [grayscale]: `./${grayscale}.ts`, [grayscaleWG]:`./${grayscaleWG}.ts`}) => { return {
 	mode: 'development',
