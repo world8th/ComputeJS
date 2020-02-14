@@ -69,13 +69,21 @@
             return globalify(memory.buffer, BigInt(localAddress));
         },
 
+        showNumber: (size) => {
+            console.log("DEBUG:" + size);
+        },
+
         vkCreateInstance: (instanceCreateInfoAddress, allocatorAddress, instanceAddress) => { // will skipe pointer instance directly into...
             console.log(`vkCreateInstance(${instanceCreateInfoAddress}, ${allocatorAddress}, ${instanceAddress})`);
             
-            let originInfo = new VkInstanceCreateInfo({$memoryBuffer: memory.buffer, $memoryOffset:instanceCreateInfoAddress});
-            let createInfo = new VkInstanceCreateInfo(); // Directly Still UNABLE
-            
-            let appInfo = originInfo.pApplicationInfo;
+            // 
+            console.log("sizeof(VkInstanceCreateInfo) = ", VkInstanceCreateInfo.byteLength);
+            console.log("sizeof(VkApplicationInfo) = ", VkApplicationInfo.byteLength);
+
+            let createInfo = new VkInstanceCreateInfo({$memoryBuffer: memory.buffer, $memoryOffset:instanceCreateInfoAddress});
+            //let createInfo = new VkInstanceCreateInfo(); // Directly Still UNABLE
+
+            let appInfo = createInfo.pApplicationInfo;
             //appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
             //appInfo.pApplicationName = "App";
             //appInfo.applicationVersion = VK_MAKE_VERSION(1, 1, 0);
@@ -87,23 +95,35 @@
                 "VK_LAYER_LUNARG_standard_validation",
                 "VK_LAYER_KHRONOS_validation"
             ];
-            createInfo.sType = originInfo.sType;//VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-            createInfo.pApplicationInfo = originInfo.pApplicationInfo;//appInfo;
-            createInfo.ppEnabledLayerNames = originInfo.ppEnabledLayerNames;
-            createInfo.enabledLayerCount = 0;//originInfo.enabledLayerCount;
-            createInfo.ppEnabledExtensionNames = originInfo.ppEnabledExtensionNames;
-            createInfo.enabledExtensionCount = 0;//originInfo.enabledExtensionCount;
+            //createInfo.sType = originInfo.sType;//VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+            //createInfo.pApplicationInfo = originInfo.pApplicationInfo;//appInfo;
+            //createInfo.ppEnabledLayerNames = originInfo.ppEnabledLayerNames;
+            //createInfo.enabledLayerCount = 0;//originInfo.enabledLayerCount;
+            //createInfo.ppEnabledExtensionNames = originInfo.ppEnabledExtensionNames;
+            //createInfo.enabledExtensionCount = 0;//originInfo.enabledExtensionCount;
+            
+// Currently, NVK working WRONG (I even Attemped to use global address hack)
+console.log(`VkInstanceCreateInfo {
+    sType: ${createInfo.sType};
+    pNext: ${createInfo.pNext};
+    flags: ${createInfo.flags};
+    pApplicationInfo: ${createInfo.pApplicationInfo};
+    enabledLayerCount: ${createInfo.enabledLayerCount};
+    ppEnabledLayerNames: ${createInfo.ppEnabledLayerNames};
+    enabledExtensionCount: ${createInfo.enabledExtensionCount};
+    ppEnabledExtensionNames: ${createInfo.ppEnabledExtensionNames};
+};`);
 
-            console.log(`VkInstanceCreateInfo {
-                sType: ${createInfo.sType};
-                pNext: ${createInfo.pNext};
-                flags: ${createInfo.flags};
-                pApplicationInfo: ${createInfo.pApplicationInfo};
-                enabledLayerCount: ${createInfo.enabledLayerCount};
-                ppEnabledLayerNames: ${createInfo.ppEnabledLayerNames};
-                enabledExtensionCount: ${createInfo.enabledExtensionCount};
-                ppEnabledExtensionNames: ${createInfo.ppEnabledExtensionNames};
-            };`);
+// Currently, NVK working WRONG (I even Attemped to use global address hack)
+console.log(`VkApplicationInfo {
+    sType: ${appInfo.sType};
+    pNext: ${appInfo.pNext};
+    pApplicationName: ${appInfo.pApplicationInfo};
+    applicationVersion: ${appInfo.pApplicationName};
+    pEngineName: ${appInfo.pEngineName};
+    engineVersion: ${appInfo.engineVersion};
+    apiVersion: ${appInfo.apiVersion};
+};`);
             
             let instance = new VkInstance({ $memoryOffset: instanceAddress, $memoryBuffer: memory.buffer });
             return vkCreateInstance(createInfo, allocatorAddress, instance);

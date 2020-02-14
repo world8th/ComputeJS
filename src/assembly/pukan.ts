@@ -22,8 +22,9 @@ type VkResult = u32;
 
 // 
 class u32x2 { a: u32; b: u32; };
+class u64x1 { a: u64 };
 let memAddress32x2: u32x2 = { a: 0, b: 0 };
-let memAddress: u64 = 0;
+let memAddress64x1: u64x1 = { a: 0 };
 
 // 
 @external("env", "vkCreateInstance")
@@ -33,12 +34,15 @@ declare function vkCreateInstance(instanceInfo: lptr_t, allocator: lptr_t, point
 @external("env", "vkEnumerateInstanceLayerProperties")
 declare function vkEnumerateInstanceLayerProperties(amount: lptr_t, layerProperties: lptr_t): VkResult;
 
+// 
+@external("env", "showNumber")
+declare function showNumber(size: u32): void;
 
 // 
-class VkInstance { handle: u64; }; // XPEH-TB
+@unmanaged class VkInstance { handle: u64; }; // XPEH-TB
 
 // 
-class VkApplicationInfo {
+@unmanaged class VkApplicationInfo {
     @offset(0x0) sType: u32;
     @offset(0x8) pNext: gptr_t;
     @offset(0x10) pApplicationName: gptr_t;
@@ -49,7 +53,7 @@ class VkApplicationInfo {
 };
 
 // 
-class VkInstanceCreateInfo {
+@unmanaged class VkInstanceCreateInfo {
     @offset(0x0) sType: u32;
     @offset(0x8) pNext: gptr_t;
     @offset(0x10) flags: u32;
@@ -70,19 +74,23 @@ class VkLayerProperties {
 
 // 
 function mUSizePtr(local: usize): gptr_t {
-    return memAddress + <u64>local;
+    return memAddress64x1.a + <u64>local;
 };
 
 // 
 export function setMemAddress(a: u32, b: u32): void {
     memAddress32x2.a = a, memAddress32x2.b = b;
-    <u64>(memAddress = load<u64>(changetype<lptr_t>(memAddress32x2)));
+    store<u64>(changetype<lptr_t>(memAddress64x1), load<u64>(changetype<lptr_t>(memAddress32x2)));
 };
 
 // 
 export function start(): void {
+    showNumber(offsetof<VkInstanceCreateInfo>());
+    showNumber(offsetof<VkApplicationInfo>());
+    
 
-    let extensions: gptr_t[] = [ mUSizePtr(changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("App Game")))) ];
+    // 
+    let extensions: gptr_t[] = [ mUSizePtr(changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_KHR_get_physical_device_properties2")))) ];
     let instlayers: gptr_t[] = [ mUSizePtr(changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_LAYER_KHRONOS_validation")))) ];
     
     // 
