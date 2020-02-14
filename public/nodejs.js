@@ -1,5 +1,0 @@
-(async() => {
-    "use strict";
-    
-    
-})();

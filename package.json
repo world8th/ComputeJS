@@ -2,10 +2,14 @@
   "scripts": {
     "asbuild:untouched": "asc src/assembly/index.ts -b build/assembly/untouched.wasm -t build/assembly/untouched.wat --sourceMap --validate --debug    --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd",
     "asbuild:optimized": "asc src/assembly/index.ts -b build/assembly/optimized.wasm -t build/assembly/optimized.wat --sourceMap --validate --optimize --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd",
+    "vkbuild:untouched": "asc src/assembly/pukan.ts -b build/assembly/pukan-unt.wasm -t build/assembly/pukan-unt.wat --sourceMap --validate --debug    --runtime full --importMemory --enable bulk-memory,threads,sign-extension,simd",
+    "vkbuild:optimized": "asc src/assembly/pukan.ts -b build/assembly/pukan-opt.wasm -t build/assembly/pukan-opt.wat --sourceMap --validate --optimize --runtime full --importMemory --enable bulk-memory,threads,sign-extension,simd",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
+    "vkbuild": "npm run vkbuild:untouched && npm run vkbuild:optimized",
     "start": "npm i && npm run build && npm run dev",
     "dev": "http-server",
-    "build": "webpack --config webpack.prod.js"
+    "build": "webpack --config webpack.prod.js",
+    "pukan": "ts-node ./public/instance.ts --experimental-wasm-anyref --experimental-wasm-bigint --experimental-wasm-bulk-memory --experimental-wasm-eh --experimental-wasm-mv --experimental-wasm-return-call --experimental-wasm-sat-f2i-conversions --experimental-wasm-se --experimental-wasm-simd --experimental-wasm-threads --experimental-wasm-type-reflection"
   },
   "devDependencies": {
     "@types/gl-matrix": "^2.4.5",
@@ -16,6 +20,7 @@
     "eslint-plugin-import": "^2.20.1",
     "http-server": "^0.12.0",
     "ts-loader": "^6.2.1",
+    "ts-node": "^8.6.2",
     "typescript": "^3.7.5",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.41.5",
@@ -25,8 +30,11 @@
   "dependencies": {
     "assemblyscript": "^0.9.1",
     "binaryen": "^90.0.0",
+    "cross-blob": "^1.2.1",
     "gl-matrix": "^3.1.0",
     "lodash": "^4.17.15",
+    "node-fetch": "^2.6.0",
+    "nvk": "^0.7.9",
     "serialize-javascript": "^2.1.2",
     "wabt": "^1.0.12",
     "webgpu": "0.0.9"

@@ -23,6 +23,7 @@
         "sourceMap": true,
         "strictNullChecks": false,
         "jsx": "react",
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        "allowJs": true
     }
 }

@@ -1,4 +1,8 @@
-const { Worker, isMainThread, parentPort, workerData } = typeof require != "undefined" ? require('worker_threads') : { Worker, isMainThread: true, parentPort: this, workerData: {} };
+const { Worker, isMainThread, parentPort, workerData } = typeof require != "undefined" ? require('worker_threads') : { Worker: global.Worker, isMainThread: true, parentPort: this, workerData: {} };
+//const fetch = typeof require != "undefined" ? require('node-fetch') : global.fetch;
+//const Blob  = typeof require != "undefined" ? require('cross-blob') : global.Blob;
+let fs;
+if (typeof require != "undefined") fs = require("fs");
 
 let ThreadCode = (support = ``)=>{ return `
 let instance = null, threads = 1, id = 0;
@@ -42,8 +46,13 @@ class Workgroup {
         this.workers = [];
 
         // initialize threads
-        let blob = new Blob([ThreadCode(supportCode)],{type:"text/javascript"}), url = URL.createObjectURL(blob);
-        for (let i=0;i<threads;i++) { this.workers.push(new Worker(url)); }
+        let blob = null, url = "";
+        if (typeof Blob != "undefined") {
+            blob = new Blob([ThreadCode(supportCode)],{type:"text/javascript"}), url = URL.createObjectURL(blob);
+            for (let i=0;i<threads;i++) { this.workers.push(new Worker(url)); }
+        } else {
+            url = ThreadCode(supportCode);
+        }
 
         // 
         this.reponseIndex = 0, this.responses = {};
@@ -53,20 +62,30 @@ class Workgroup {
         this.responses[resp] = [];
 
         // initialize workers
-        this.moduleFetch = (await fetch(module)).arrayBuffer();
-        this.module = await WebAssembly.compile(await this.moduleFetch);
+        try {
+            if (typeof fetch != "undefined") this.moduleFetch = await (await fetch(module)).arrayBuffer();
+            if (typeof fetch == "undefined") this.moduleFetch = fs.readFileSync(module).buffer;
+        } catch(e) {
+            console.error(e);
+        }
+
+        try {
+            this.module = await WebAssembly.compile(this.moduleFetch);
+        } catch(e) {
+            console.error(e);
+        }
 
         // create shared memory model
         this.memory = new WebAssembly.Memory({initial: 1, maximum: 65536, shared: true});
         //this.table = new WebAssembly.Table({initial: 1, maximum: 65536, shared: true, element: "anyfunc"});
 
         // create host/manager instance
-        this.instance = await WebAssembly.instantiate(this.module, { env: {
+        (this.instance = await WebAssembly.instantiate(this.module, { env: {
             memory: this.memory,
             abort: function() { throw Error("abort called"); }
-        }});
-        this.instance.exports.init(threads);
+        }})).exports.init(threads);
 
+        // 
         this.workers.every(async (w,i)=>{
             w.responses = {};
             w.onmessage = (e)=>{ w.responses[e.data.response].resolved = e.data; };
