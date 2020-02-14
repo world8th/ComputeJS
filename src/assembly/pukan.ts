@@ -20,30 +20,18 @@ type gptr_t = u64;
 type lptr_t = usize;
 type VkResult = u32;
 
+// 
+class u32x2 { a: u32; b: u32; };
+let memAddress32x2: u32x2 = { a: 0, b: 0 };
+let memAddress: u64 = 0;
 
+// 
 @external("env", "vkCreateInstance")
 declare function vkCreateInstance(instanceInfo: lptr_t, allocator: lptr_t, pointerToInstance: lptr_t): VkResult;
 
+// 
 @external("env", "vkEnumerateInstanceLayerProperties")
 declare function vkEnumerateInstanceLayerProperties(amount: lptr_t, layerProperties: lptr_t): VkResult;
-
-//@external("env", "mUSizePtr")
-//declare function mUSizePtr(local: usize): gptr_t;
-
-//@external("env", "mInt64Ptr")
-//declare function mInt64Ptr(local: u64): gptr_t;
-
-@external("env", "memoryAddress")
-declare var memoryAddress: usize;
-
-// 
-function mUSizePtr(local: usize): gptr_t {
-    return memoryAddress + <u64>local;
-};
-
-// 
-//function ptr(local: usize): gptr_t { return mUSizePtr(local); }
-//function ptr(local: usize): lptr_t { return local; }
 
 
 // 
@@ -51,25 +39,25 @@ class VkInstance { handle: u64; }; // XPEH-TB
 
 // 
 class VkApplicationInfo {
-    sType: u32;
-    pNext: gptr_t;
-    pApplicationName: gptr_t;
-    applicationVersion: u32;
-    pEngineName: gptr_t;
-    engineVersion: u32;
-    apiVersion: u32;
+    @offset(0x0) sType: u32;
+    @offset(0x8) pNext: gptr_t;
+    @offset(0x10) pApplicationName: gptr_t;
+    @offset(0x18) applicationVersion: u32;
+    @offset(0x20) pEngineName: gptr_t;
+    @offset(0x28) engineVersion: u32;
+    @offset(0x2C) apiVersion: u32;
 };
 
 // 
 class VkInstanceCreateInfo {
-    sType: u32;
-    pNext: gptr_t;
-    flags: u32;
-    pApplicationInfo: gptr_t;
-    enabledLayerCount: u32;
-    ppEnabledLayerNames: gptr_t;
-    enabledExtensionCount: u32;
-    ppEnabledExtensionNames: gptr_t;
+    @offset(0x0) sType: u32;
+    @offset(0x8) pNext: gptr_t;
+    @offset(0x10) flags: u32;
+    @offset(0x18) pApplicationInfo: gptr_t;
+    @offset(0x20) enabledLayerCount: u32;
+    @offset(0x28) ppEnabledLayerNames: gptr_t;
+    @offset(0x30) enabledExtensionCount: u32;
+    @offset(0x38) ppEnabledExtensionNames: gptr_t;
 };
 
 // 
@@ -81,43 +69,58 @@ class VkLayerProperties {
 };
 
 // 
-let instance: VkInstance = {handle: 0};
-let applicationName = Uint8Array.wrap(String.UTF8.encode("App Game"));
-let engineName = Uint8Array.wrap(String.UTF8.encode("No Engine"));
-
-// 
-let appInfo: VkApplicationInfo = {
-    sType: 0,
-    pNext: 0,
-    pApplicationName: mUSizePtr(changetype<lptr_t>(applicationName)),
-    applicationVersion: VK_MAKE_VERSION(1, 0, 0),
-    pEngineName: mUSizePtr(changetype<lptr_t>(engineName)),
-    engineVersion: VK_MAKE_VERSION(1, 0, 0),
-    apiVersion: VK_API_VERSION_1_0
+function mUSizePtr(local: usize): gptr_t {
+    return memAddress + <u64>local;
 };
 
 // 
-let validationLayers  : Array<gptr_t> = [ <gptr_t>changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_LAYER_KHRONOS_validation"))) ];
-let instanceExtensions: Array<gptr_t> = [ ];
-let instanceInfo: VkInstanceCreateInfo = {
-    sType: 1,
-    pNext: 0,
-    flags: 0,
-    pApplicationInfo: mUSizePtr(changetype<lptr_t>(appInfo)),
-    enabledLayerCount: validationLayers.length,
-    ppEnabledLayerNames: mUSizePtr(changetype<lptr_t>(validationLayers)),
-    enabledExtensionCount: instanceExtensions.length,
-    ppEnabledExtensionNames: mUSizePtr(changetype<lptr_t>(instanceExtensions))
+export function setMemAddress(a: u32, b: u32): void {
+    memAddress32x2.a = a, memAddress32x2.b = b;
+    <u64>(memAddress = load<u64>(changetype<lptr_t>(memAddress32x2)));
 };
 
+// 
+export function start(): void {
 
-let result = vkCreateInstance(changetype<lptr_t>(instanceInfo), 0, changetype<lptr_t>(instance));
-if (result !== 0) throw `Failed to create VkInstance!`;
+    let extensions: gptr_t[] = [ mUSizePtr(changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("App Game")))) ];
+    let instlayers: gptr_t[] = [ mUSizePtr(changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_LAYER_KHRONOS_validation")))) ];
+    
+    // 
+    let instance: VkInstance = {handle: 0};
+    let applicationName = Uint8Array.wrap(String.UTF8.encode("App Game"));
+    let engineName = Uint8Array.wrap(String.UTF8.encode("No Engine"));
 
+    // 
+    let appInfo: VkApplicationInfo = {
+        sType: 0,
+        pNext: 0,
+        pApplicationName: mUSizePtr(changetype<lptr_t>(applicationName)),
+        applicationVersion: VK_MAKE_VERSION(1, 0, 0),
+        pEngineName: mUSizePtr(changetype<lptr_t>(engineName)),
+        engineVersion: VK_MAKE_VERSION(1, 0, 0),
+        apiVersion: VK_API_VERSION_1_1
+    };
 
-/*
-let amountOfLayers: u32 = 0;
-vkEnumerateInstanceLayerProperties(changetype<lptr_t>(amountOfLayers), 0);
-let layers: VkLayerProperties[] = new Array<VkLayerProperties>(amountOfLayers);
-vkEnumerateInstanceLayerProperties(changetype<lptr_t>(amountOfLayers), changetype<lptr_t>(layers));
-*/
+    // 
+    let validationLayers   : u32x2 = { a: 0, b: 0 };
+    let instanceExtensions : u32x2 = { a: 0, b: 0 };
+    let instanceInfo: VkInstanceCreateInfo = {
+        sType: 1, pNext: 0, flags: 0, 
+        pApplicationInfo: mUSizePtr(changetype<lptr_t>(appInfo)),
+        enabledLayerCount: instlayers.length,
+        ppEnabledLayerNames: mUSizePtr(changetype<lptr_t>(instlayers)),
+        enabledExtensionCount: extensions.length,
+        ppEnabledExtensionNames: mUSizePtr(changetype<lptr_t>(extensions))
+    };
+
+    // 
+    let result = vkCreateInstance(changetype<lptr_t>(instanceInfo), 0, changetype<lptr_t>(instance));
+    if (result !== 0) throw `Failed to create VkInstance!`;
+    
+    // 
+    let amountOfLayers: u32 = 0;
+    vkEnumerateInstanceLayerProperties(changetype<lptr_t>(amountOfLayers), 0);
+    let layers: VkLayerProperties[] = new Array<VkLayerProperties>(amountOfLayers);
+    vkEnumerateInstanceLayerProperties(changetype<lptr_t>(amountOfLayers), changetype<lptr_t>(layers));
+
+};

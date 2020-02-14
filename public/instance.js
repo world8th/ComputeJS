@@ -72,8 +72,28 @@
         vkCreateInstance: (instanceCreateInfoAddress, allocatorAddress, instanceAddress) => { // will skipe pointer instance directly into...
             console.log(`vkCreateInstance(${instanceCreateInfoAddress}, ${allocatorAddress}, ${instanceAddress})`);
             
-            let createInfo = new VkInstanceCreateInfo({$memoryBuffer:memory.buffer, $memoryOffset:instanceCreateInfoAddress});
+            let originInfo = new VkInstanceCreateInfo({$memoryBuffer: memory.buffer, $memoryOffset:instanceCreateInfoAddress});
+            let createInfo = new VkInstanceCreateInfo(); // Directly Still UNABLE
             
+            let appInfo = originInfo.pApplicationInfo;
+            //appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+            //appInfo.pApplicationName = "App";
+            //appInfo.applicationVersion = VK_MAKE_VERSION(1, 1, 0);
+            //appInfo.pEngineName = "Engine";
+            //appInfo.engineVersion = VK_MAKE_VERSION(1, 1, 0);
+            //appInfo.apiVersion = VK_API_VERSION_1_1;
+            
+            let validationLayers = [
+                "VK_LAYER_LUNARG_standard_validation",
+                "VK_LAYER_KHRONOS_validation"
+            ];
+            createInfo.sType = originInfo.sType;//VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+            createInfo.pApplicationInfo = originInfo.pApplicationInfo;//appInfo;
+            createInfo.ppEnabledLayerNames = originInfo.ppEnabledLayerNames;
+            createInfo.enabledLayerCount = 0;//originInfo.enabledLayerCount;
+            createInfo.ppEnabledExtensionNames = originInfo.ppEnabledExtensionNames;
+            createInfo.enabledExtensionCount = 0;//originInfo.enabledExtensionCount;
+
             console.log(`VkInstanceCreateInfo {
                 sType: ${createInfo.sType};
                 pNext: ${createInfo.pNext};
@@ -84,13 +104,9 @@
                 enabledExtensionCount: ${createInfo.enabledExtensionCount};
                 ppEnabledExtensionNames: ${createInfo.ppEnabledExtensionNames};
             };`);
-
-            let instance = new nvk.VkInstance({ $memoryOffset: instanceAddress, $memoryBuffer: memory.buffer });
-
-            //let instance = new nvk.VkInstance();
-            //let result = nvk.vkCreateInstance(createInfo, allocatorAddress, instance);
-            //new BigUint64Array(ArrayBuffer.fromAddress(instanceAddress))[0] = instance.BigInt;
-            return  nvk.vkCreateInstance(createInfo, allocatorAddress, instance);//result;
+            
+            let instance = new VkInstance({ $memoryOffset: instanceAddress, $memoryBuffer: memory.buffer });
+            return vkCreateInstance(createInfo, allocatorAddress, instance);
         },
         
         vkEnumerateInstanceLayerProperties: (amountOfLayersAddress, layerPropertiesAddress) =>{
@@ -131,7 +147,7 @@
 
     // 
     let pukan = {}, env = Object.assign(
-        { memory, abort: function() { throw Error("abort called"); }, ...VK, memoryAddress: new WebAssembly.Global({value:'i32', mutable:true}, Number(memory.buffer.getAddress())) }, 
+        { memory, abort: function() { throw Error("abort called"); }, ...VK }, 
     );
 
     // create host/manager instance
@@ -139,5 +155,10 @@
     let cmodule = null, vmodule = null;
     try { cmodule = WebAssembly.instantiate(module, {env, pukan}); } catch(e) { console.error(e); };
     try { vmodule = module ? (await cmodule) : { exports: {} }; } catch(e) { console.error(e); };
+
+    // 
+    let address = memory.buffer.getAddress();
+    vmodule.exports.setMemAddress( Number(address>>BigInt(0)), Number(address>>BigInt(32)) ); // drobly 
+    vmodule.exports.start();
 
 })();
