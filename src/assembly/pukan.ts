@@ -38,6 +38,18 @@ declare function vkEnumerateInstanceLayerProperties(amount: lptr_t, layerPropert
 @external("env", "showNumber")
 declare function showNumber(size: u32): void;
 
+//
+@external("env", "globalify")
+declare function globalify(local: usize, pt64: usize): usize; // pt64 is output with global pointer 
+
+// 
+let last64: u64[] = [0];
+
+// 
+function ptr(local: usize): u64 {
+    globalify(local, changetype<usize>(last64)); return last64[0];
+}
+
 // 
 @unmanaged class VkInstance { handle: u64; }; // XPEH-TB
 
@@ -74,7 +86,8 @@ class VkLayerProperties {
 
 // 
 function mUSizePtr(local: usize): gptr_t {
-    return memAddress64x1.a + <u64>local;
+    //return memAddress64x1.a + <u64>local;
+    return ptr(local);
 };
 
 // 

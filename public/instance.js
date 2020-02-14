@@ -61,12 +61,19 @@
 
     // safer import (try use Vulkan bindings in WebAssembly with AssemblyScript)
     const VK = {
+        /*
         mInt64Ptr: (localAddress) => {
             return globalify(memory.buffer, localAddress);
         },
 
         mUSizePtr: (localAddress) => {
             return globalify(memory.buffer, BigInt(localAddress));
+        },*/
+
+        globalify: (localAddress, pointerToU64) => {
+            let U64 = new BigUint64Array(memory.buffer,pointerToU64,1);
+            U64[0] = BigInt(localAddress) + memory.buffer.getAddress(); // make application pointer (un-safe)
+            return localAddress;
         },
 
         showNumber: (size) => {
