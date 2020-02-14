@@ -178,7 +178,7 @@ console.log(`VkApplicationInfo {
 
     // 
     let address = memory.buffer.getAddress();
-    vmodule.exports.setMemAddress( Number(address>>BigInt(0)), Number(address>>BigInt(32)) ); // drobly 
+    vmodule.exports.setMemAddress( Number((address>>BigInt(0))&BigInt(0xFFFFFFFF)), Number((address>>BigInt(32))&BigInt(0xFFFFFFFF)) ); // drobly 
     vmodule.exports.start();
 
 })();
