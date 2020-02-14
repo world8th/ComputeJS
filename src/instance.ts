@@ -42,11 +42,14 @@ Object.assign(global, nvk);
     console.log("compute done!");
 */
 
+    // Used for INPUT to GPU's processing 
     let globalify = (memory: ArrayBufferLike, offset: bigint): bigint => {
-        let laddress: BigUint64Array = new BigUint64Array(memory, Number(offset), 1);
-        //let redirect: BigUint64Array = new BigUint64Array(memory, Number(laddress[0]), 1);
-        //console.log(nvk.getAddressFromArrayBuffer);
-        return nvk.getAddressFromArrayBuffer(memory) + laddress[0];
+        return eval("memory.getAddress()") + (new BigUint64Array(memory, Number(offset), 1))[0];
+    };
+
+    // Used for READ from GPU's processing 
+    let localify = (memory: ArrayBufferLike, address: bigint): number => {
+        return Number(address - eval("memory.getAddress()"));
     };
 
     // 
@@ -54,14 +57,21 @@ Object.assign(global, nvk);
 
     // safer import (try use Vulkan bindings in WebAssembly with AssemblyScript)
     const VK = {
-        vhHardPtr: (localAddress: bigint): bigint => {
+        mInt64Ptr: (localAddress: bigint): bigint => {
             //console.log(localAddress);
             let ptr = globalify(memory.buffer, localAddress);
             //console.log(ptr);
             return ptr;
         },
 
-        vkCreateInstance: (instanceCreateInfoAddress, allocatorAddress, instancePointerAddress): number => { // will skipe pointer instance directly into...
+        mUSizePtr: (localAddress: number): bigint => {
+            //console.log(localAddress);
+            let ptr = globalify(memory.buffer, BigInt(localAddress));
+            //console.log(ptr);
+            return ptr;
+        },
+
+        vkCreateInstance: (instanceCreateInfoAddress: number, allocatorAddress: bigint, instancePointerAddress: bigint): number => { // will skipe pointer instance directly into...
             console.log(`vkCreateInstance(${instanceCreateInfoAddress}, ${allocatorAddress}, ${instancePointerAddress})`);
             
             let createInfo: nvk.VkInstanceCreateInfo = new nvk.VkInstanceCreateInfo({$memoryBuffer:memory.buffer, $memoryOffset:instanceCreateInfoAddress});
@@ -85,9 +95,9 @@ Object.assign(global, nvk);
                 pApplicationName: ${createInfo.pApplicationInfo};
             };`);*/
 
-            return nvk.vkCreateInstance(new nvk.VkInstanceCreateInfo({$memoryBuffer:memory.buffer, $memoryOffset:instanceCreateInfoAddress}), new BigUint64Array(memory.buffer, allocatorAddress, 1), new nvk.VkInstance({$memoryBuffer:memory.buffer, $memoryOffset:instancePointerAddress}));
+            return nvk.vkCreateInstance(new nvk.VkInstanceCreateInfo({$memoryBuffer:memory.buffer, $memoryOffset:instanceCreateInfoAddress}), allocatorAddress, new nvk.VkInstance({$memoryBuffer:memory.buffer, $memoryOffset:instancePointerAddress}));
         },
-        vkEnumerateInstanceLayerProperties: (amountOfLayersAddress, layerPropertiesAddress): number =>{
+        vkEnumerateInstanceLayerProperties: (amountOfLayersAddress: bigint, layerPropertiesAddress: bigint): number =>{
             return 0;
             //return nvk.vkEnumerateInstanceLayerProperties({$:new Uint32Array(memory.buffer,amountOfLayersAddress,1)}, nvk.VkLayerProperties({$memoryBuffer:memory.buffer, $memoryOffset:layerPropertiesAddress}));
         }

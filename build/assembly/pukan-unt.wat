@@ -5,9 +5,13 @@
  (type $i32_i32_i32_=>_i32 (func (param i32 i32 i32) (result i32)))
  (type $none_=>_none (func))
  (type $i32_=>_none (func (param i32)))
+ (type $i32_=>_i64 (func (param i32) (result i64)))
  (type $i32_i32_i32_=>_none (func (param i32 i32 i32)))
  (type $i32_i32_i32_i32_=>_none (func (param i32 i32 i32 i32)))
  (type $none_=>_i32 (func (result i32)))
+ (type $i32_i64_i64_=>_i32 (func (param i32 i64 i64) (result i32)))
+ (type $i64_i64_=>_i32 (func (param i64 i64) (result i32)))
+ (type $i64_=>_i64 (func (param i64) (result i64)))
  (import "env" "memory" (memory $0 1))
  (data (i32.const 16) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00t\00l\00s\00f\00.\00t\00s\00")
  (data (i32.const 64) "(\00\00\00\01\00\00\00\01\00\00\00(\00\00\00a\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00")
@@ -22,11 +26,12 @@
  (data (i32.const 400) "*\00\00\00\01\00\00\00\01\00\00\00*\00\00\00s\00r\00c\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00p\00u\00k\00a\00n\00.\00t\00s\00")
  (data (i32.const 464) "\1c\00\00\00\01\00\00\00\01\00\00\00\1c\00\00\00I\00n\00v\00a\00l\00i\00d\00 \00l\00e\00n\00g\00t\00h\00")
  (data (i32.const 512) "&\00\00\00\01\00\00\00\01\00\00\00&\00\00\00~\00l\00i\00b\00/\00a\00r\00r\00a\00y\00b\00u\00f\00f\00e\00r\00.\00t\00s\00")
- (data (i32.const 576) "\t\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\93\00\00\00\02\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\93 \00\00\02\00\00\00")
+ (data (i32.const 576) "\t\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\13\01\00\00\02\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\93 \00\00\02\00\00\00")
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
- (import "pukan" "vhHardPtr" (func $src/assembly/pukan/vhHardPtr (param i32) (result i32)))
- (import "pukan" "vkCreateInstance" (func $src/assembly/pukan/vkCreateInstance (param i32 i32 i32) (result i32)))
- (import "pukan" "vkEnumerateInstanceLayerProperties" (func $src/assembly/pukan/vkEnumerateInstanceLayerProperties (param i32 i32) (result i32)))
+ (import "pukan" "mUSizePtr" (func $src/assembly/pukan/mUSizePtr (param i32) (result i64)))
+ (import "pukan" "vkCreateInstance" (func $src/assembly/pukan/vkCreateInstance (param i32 i64 i64) (result i32)))
+ (import "pukan" "vkEnumerateInstanceLayerProperties" (func $src/assembly/pukan/vkEnumerateInstanceLayerProperties (param i64 i64) (result i32)))
+ (import "pukan" "mInt64Ptr" (func $src/assembly/pukan/mInt64Ptr (param i64) (result i64)))
  (table $0 1 funcref)
  (global $~lib/rt/tlsf/ROOT (mut i32) (i32.const 0))
  (global $~lib/rt/tlsf/collectLock (mut i32) (i32.const 0))
@@ -51,9 +56,10 @@
  (export "__rtti_base" (global $~lib/rt/__rtti_base))
  (export "vkCreateInstance" (func $src/assembly/pukan/vkCreateInstance))
  (export "vkEnumerateInstanceLayerProperties" (func $src/assembly/pukan/vkEnumerateInstanceLayerProperties))
- (export "vhHardPtr" (func $src/assembly/pukan/vhHardPtr))
+ (export "mUSizePtr" (func $src/assembly/pukan/mUSizePtr))
+ (export "mInt64Ptr" (func $src/assembly/pukan/mInt64Ptr))
  (start $~start)
- (func $~lib/rt/tlsf/removeBlock (; 4 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/tlsf/removeBlock (; 5 ;) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -263,7 +269,7 @@
    end
   end
  )
- (func $~lib/rt/tlsf/insertBlock (; 5 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/tlsf/insertBlock (; 6 ;) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -613,7 +619,7 @@
   local.get $7
   i32.store offset=4
  )
- (func $~lib/rt/tlsf/addMemory (; 6 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $~lib/rt/tlsf/addMemory (; 7 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -761,7 +767,7 @@
   call $~lib/rt/tlsf/insertBlock
   i32.const 1
  )
- (func $~lib/rt/tlsf/maybeInitialize (; 7 ;) (result i32)
+ (func $~lib/rt/tlsf/maybeInitialize (; 8 ;) (result i32)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -911,7 +917,7 @@
   end
   local.get $0
  )
- (func $~lib/rt/tlsf/prepareSize (; 8 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/tlsf/prepareSize (; 9 ;) (param $0 i32) (result i32)
   (local $1 i32)
   (local $2 i32)
   local.get $0
@@ -940,7 +946,7 @@
   i32.gt_u
   select
  )
- (func $~lib/rt/tlsf/searchBlock (; 9 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/tlsf/searchBlock (; 10 ;) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -1123,7 +1129,7 @@
   end
   local.get $7
  )
- (func $~lib/rt/tlsf/growMemory (; 10 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/tlsf/growMemory (; 11 ;) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -1207,7 +1213,7 @@
   call $~lib/rt/tlsf/addMemory
   drop
  )
- (func $~lib/rt/tlsf/prepareBlock (; 11 ;) (param $0 i32) (param $1 i32) (param $2 i32)
+ (func $~lib/rt/tlsf/prepareBlock (; 12 ;) (param $0 i32) (param $1 i32) (param $2 i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -1302,7 +1308,7 @@
    i32.store
   end
  )
- (func $~lib/rt/tlsf/allocateBlock (; 12 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $~lib/rt/tlsf/allocateBlock (; 13 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   global.get $~lib/rt/tlsf/collectLock
@@ -1411,7 +1417,7 @@
   call $~lib/rt/tlsf/prepareBlock
   local.get $4
  )
- (func $~lib/rt/tlsf/__alloc (; 13 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/rt/tlsf/__alloc (; 14 ;) (param $0 i32) (param $1 i32) (result i32)
   call $~lib/rt/tlsf/maybeInitialize
   local.get $0
   local.get $1
@@ -1419,7 +1425,7 @@
   i32.const 16
   i32.add
  )
- (func $~lib/rt/pure/increment (; 14 ;) (param $0 i32)
+ (func $~lib/rt/pure/increment (; 15 ;) (param $0 i32)
   (local $1 i32)
   local.get $0
   i32.load offset=4
@@ -1462,7 +1468,7 @@
    unreachable
   end
  )
- (func $~lib/rt/pure/__retain (; 15 ;) (param $0 i32) (result i32)
+ (func $~lib/rt/pure/__retain (; 16 ;) (param $0 i32) (result i32)
   local.get $0
   global.get $~lib/heap/__heap_base
   i32.gt_u
@@ -1474,7 +1480,7 @@
   end
   local.get $0
  )
- (func $~lib/rt/pure/__release (; 16 ;) (param $0 i32)
+ (func $~lib/rt/pure/__release (; 17 ;) (param $0 i32)
   local.get $0
   global.get $~lib/heap/__heap_base
   i32.gt_u
@@ -1485,7 +1491,7 @@
    call $~lib/rt/pure/decrement
   end
  )
- (func $src/assembly/pukan/VK_MAKE_VERSION (; 17 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $src/assembly/pukan/VK_MAKE_VERSION (; 18 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   local.get $0
   i32.const 22
   i32.shl
@@ -1496,7 +1502,7 @@
   local.get $2
   i32.or
  )
- (func $src/assembly/pukan/VkInstance#constructor (; 18 ;) (param $0 i32) (result i32)
+ (func $src/assembly/pukan/VkInstance#constructor (; 19 ;) (param $0 i32) (result i32)
   local.get $0
   i32.eqz
   if
@@ -1511,7 +1517,7 @@
   i64.store
   local.get $0
  )
- (func $~lib/string/String.UTF8.byteLength (; 19 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/string/String.UTF8.byteLength (; 20 ;) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -1622,7 +1628,7 @@
   call $~lib/rt/pure/__release
   local.get $5
  )
- (func $~lib/string/String.UTF8.encode (; 20 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/string/String.UTF8.encode (; 21 ;) (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -1874,11 +1880,15 @@
   call $~lib/rt/pure/__release
   local.get $8
  )
- (func $~lib/array/Array<usize>#get:length (; 21 ;) (param $0 i32) (result i32)
+ (func $src/assembly/pukan/ptr (; 22 ;) (param $0 i32) (result i64)
+  local.get $0
+  call $src/assembly/pukan/mUSizePtr
+ )
+ (func $~lib/array/Array<u64>#get:length (; 23 ;) (param $0 i32) (result i32)
   local.get $0
   i32.load offset=12
  )
- (func $~lib/arraybuffer/ArrayBufferView#constructor (; 22 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
+ (func $~lib/arraybuffer/ArrayBufferView#constructor (; 24 ;) (param $0 i32) (param $1 i32) (param $2 i32) (result i32)
   (local $3 i32)
   (local $4 i32)
   (local $5 i32)
@@ -1950,7 +1960,7 @@
   i32.store offset=8
   local.get $0
  )
- (func $~lib/array/Array<src/assembly/pukan/VkLayerProperties>#constructor (; 23 ;) (param $0 i32) (param $1 i32) (result i32)
+ (func $~lib/array/Array<src/assembly/pukan/VkLayerProperties>#constructor (; 25 ;) (param $0 i32) (param $1 i32) (result i32)
   local.get $0
   if (result i32)
    local.get $0
@@ -1972,7 +1982,7 @@
   i32.store offset=12
   local.get $0
  )
- (func $start:src/assembly/pukan (; 24 ;)
+ (func $start:src/assembly/pukan (; 26 ;)
   (local $0 i32)
   (local $1 i32)
   (local $2 i32)
@@ -1991,7 +2001,7 @@
   i32.const 0
   call $src/assembly/pukan/VkInstance#constructor
   global.set $src/assembly/pukan/instance
-  i32.const 28
+  i32.const 48
   i32.const 4
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
@@ -2000,41 +2010,41 @@
   i32.const 0
   i32.store
   local.get $0
-  i32.const 0
-  i32.store offset=4
+  i64.const 0
+  i64.store offset=8
   local.get $0
   i32.const 192
   i32.const 0
   call $~lib/string/String.UTF8.encode
   local.tee $1
-  call $src/assembly/pukan/vhHardPtr
-  i32.store offset=8
+  call $src/assembly/pukan/ptr
+  i64.store offset=16
   local.get $0
   i32.const 1
   i32.const 0
   i32.const 0
   call $src/assembly/pukan/VK_MAKE_VERSION
-  i32.store offset=12
+  i32.store offset=24
   local.get $0
   i32.const 272
   i32.const 0
   call $~lib/string/String.UTF8.encode
   local.tee $2
-  call $src/assembly/pukan/vhHardPtr
-  i32.store offset=16
+  call $src/assembly/pukan/ptr
+  i64.store offset=32
   local.get $0
   i32.const 1
   i32.const 0
   i32.const 0
   call $src/assembly/pukan/VK_MAKE_VERSION
-  i32.store offset=20
+  i32.store offset=40
   local.get $0
   global.get $src/assembly/pukan/VK_API_VERSION_1_0
-  i32.store offset=24
+  i32.store offset=44
   local.get $0
   call $~lib/rt/pure/__retain
   global.set $src/assembly/pukan/appInfo
-  i32.const 32
+  i32.const 64
   i32.const 6
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
@@ -2043,34 +2053,34 @@
   i32.const 1
   i32.store
   local.get $3
-  i32.const 0
-  i32.store offset=4
+  i64.const 0
+  i64.store offset=8
   local.get $3
-  i32.const 0
-  i32.store offset=12
-  local.get $3
-  global.get $src/assembly/pukan/validationLayers
-  call $~lib/array/Array<usize>#get:length
-  i32.store offset=16
+  i64.const 0
+  i64.store offset=24
   local.get $3
   global.get $src/assembly/pukan/validationLayers
-  call $src/assembly/pukan/vhHardPtr
-  i32.store offset=20
+  call $~lib/array/Array<u64>#get:length
+  i32.store offset=32
+  local.get $3
+  global.get $src/assembly/pukan/validationLayers
+  call $src/assembly/pukan/ptr
+  i64.store offset=40
   local.get $3
   global.get $src/assembly/pukan/instanceExtensions
-  call $~lib/array/Array<usize>#get:length
-  i32.store offset=24
+  call $~lib/array/Array<u64>#get:length
+  i32.store offset=48
   local.get $3
   global.get $src/assembly/pukan/instanceExtensions
-  call $src/assembly/pukan/vhHardPtr
-  i32.store offset=28
+  call $src/assembly/pukan/ptr
+  i64.store offset=56
   local.get $3
   call $~lib/rt/pure/__retain
   global.set $src/assembly/pukan/instanceInfo
   global.get $src/assembly/pukan/instanceInfo
-  i32.const 0
+  i64.const 0
   global.get $src/assembly/pukan/instance
-  call $src/assembly/pukan/vhHardPtr
+  call $src/assembly/pukan/ptr
   call $src/assembly/pukan/vkCreateInstance
   global.set $src/assembly/pukan/result
   global.get $src/assembly/pukan/result
@@ -2087,14 +2097,14 @@
    call $~lib/rt/pure/__release
    i32.const 0
    i32.const 416
-   i32.const 76
+   i32.const 79
    i32.const 18
    call $~lib/builtins/abort
    unreachable
   end
   global.get $src/assembly/pukan/amountOfLayers
-  call $src/assembly/pukan/vhHardPtr
-  i32.const 0
+  call $src/assembly/pukan/ptr
+  i64.const 0
   call $src/assembly/pukan/vkEnumerateInstanceLayerProperties
   drop
   i32.const 0
@@ -2102,9 +2112,9 @@
   call $~lib/array/Array<src/assembly/pukan/VkLayerProperties>#constructor
   global.set $src/assembly/pukan/layers
   global.get $src/assembly/pukan/amountOfLayers
-  call $src/assembly/pukan/vhHardPtr
+  call $src/assembly/pukan/ptr
   global.get $src/assembly/pukan/layers
-  call $src/assembly/pukan/vhHardPtr
+  call $src/assembly/pukan/ptr
   call $src/assembly/pukan/vkEnumerateInstanceLayerProperties
   drop
   local.get $0
@@ -2116,13 +2126,13 @@
   local.get $3
   call $~lib/rt/pure/__release
  )
- (func $~start (; 25 ;)
+ (func $~start (; 27 ;)
   call $start:src/assembly/pukan
  )
- (func $~lib/rt/pure/__collect (; 26 ;)
+ (func $~lib/rt/pure/__collect (; 28 ;)
   return
  )
- (func $~lib/rt/tlsf/freeBlock (; 27 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/tlsf/freeBlock (; 29 ;) (param $0 i32) (param $1 i32)
   (local $2 i32)
   local.get $1
   i32.load
@@ -2136,7 +2146,7 @@
   local.get $1
   call $~lib/rt/tlsf/insertBlock
  )
- (func $~lib/rt/pure/decrement (; 28 ;) (param $0 i32)
+ (func $~lib/rt/pure/decrement (; 30 ;) (param $0 i32)
   (local $1 i32)
   (local $2 i32)
   local.get $0
@@ -2211,7 +2221,7 @@
    i32.store offset=4
   end
  )
- (func $~lib/rt/pure/__visit (; 29 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/pure/__visit (; 31 ;) (param $0 i32) (param $1 i32)
   local.get $0
   global.get $~lib/heap/__heap_base
   i32.lt_u
@@ -2235,10 +2245,10 @@
   i32.sub
   call $~lib/rt/pure/decrement
  )
- (func $~lib/array/Array<usize>#__visit_impl (; 30 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/array/Array<u64>#__visit_impl (; 32 ;) (param $0 i32) (param $1 i32)
   nop
  )
- (func $~lib/array/Array<src/assembly/pukan/VkLayerProperties>#__visit_impl (; 31 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/array/Array<src/assembly/pukan/VkLayerProperties>#__visit_impl (; 33 ;) (param $0 i32) (param $1 i32)
   (local $2 i32)
   (local $3 i32)
   (local $4 i32)
@@ -2277,7 +2287,7 @@
    end
   end
  )
- (func $~lib/rt/__visit_members (; 32 ;) (param $0 i32) (param $1 i32)
+ (func $~lib/rt/__visit_members (; 34 ;) (param $0 i32) (param $1 i32)
   (local $2 i32)
   block $block$4$break
    block $switch$1$default
@@ -2297,7 +2307,7 @@
      end
      local.get $0
      local.get $1
-     call $~lib/array/Array<usize>#__visit_impl
+     call $~lib/array/Array<u64>#__visit_impl
      br $block$4$break
     end
     local.get $0
