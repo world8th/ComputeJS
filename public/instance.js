@@ -166,7 +166,7 @@ console.log(`VkApplicationInfo {
 */
 
     // oh, sh&t
-    const fs = require("fs"), code = fs.readFileSync("./build/assembly/pukan-opt.wasm"); 
+    const fs = require("fs"), code = fs.readFileSync("./public/assembly/pukan-opt.wasm"); 
     //console.log(code ? "Has Module" : "Something Wrong (Oh, SH&T!)"); if (code) console.log(code);
     
     // 
