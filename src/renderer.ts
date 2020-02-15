@@ -105,10 +105,10 @@ export default class Renderer {
                 res.arrayBuffer().then((arr) => new Uint32Array(arr))
             );
 
-        const vsmDesc: any = { code: await loadShader('/assets/shaders/triangle.vert.spv') };
+        const vsmDesc: any = { code: await loadShader('/shaders/triangle.vert.spv') };
         this.vertModule = this.device.createShaderModule(vsmDesc);
 
-        const fsmDesc: any = { code: await loadShader('/assets/shaders/triangle.frag.spv') };
+        const fsmDesc: any = { code: await loadShader('/shaders/triangle.frag.spv') };
         this.fragModule = this.device.createShaderModule(fsmDesc);
 
         // ⚗️ Graphics Pipeline

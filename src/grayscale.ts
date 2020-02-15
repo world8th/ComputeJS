@@ -1,6 +1,6 @@
-/// <reference path="../build/lib/compute.d.ts" />
+/// <reference path="./lib/compute.d.ts" />
 
-import { Compute } from "../build/lib/compute.js";
+import { Compute } from "./lib/compute.js";
 
 (async ()=>{
     let canvas: HTMLCanvasElement = document.querySelector("#canvas");
@@ -12,14 +12,14 @@ import { Compute } from "../build/lib/compute.js";
         image.onload=resolve;
         image.onerror=reject;
     });
-    image.src = "assets/images/test.png";
+    image.src = "images/test.png";
     await promise;
 
     // import compute library 
-    let compute: Compute.Module = (await import("./build/lib/compute.js")).default; // Required Type Conversion
+    let compute: Compute.Module = (await import("./lib/compute.js")).default; // Required Type Conversion
     
     // create wasm workgroup (4 threads) with module
-    let workgroup = await compute.workgroup("./build/assembly/optimized.wasm", 6, `
+    let workgroup = await compute.workgroup("./assembly/optimized.wasm", 6, `
         await (async (data)=>{
             return instance.exports[data.name](id, ...data.args);
         })`);

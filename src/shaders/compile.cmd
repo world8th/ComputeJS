@@ -1,1 +1,1 @@
-glslangValidator ./grayscale.comp -V -o ../../build/shaders/grayscale.comp.spv
+glslangValidator ./grayscale.comp -V -o ../../public/shaders/grayscale.comp.spv

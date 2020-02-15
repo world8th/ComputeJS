@@ -1,6 +1,6 @@
-/// <reference path="../build/lib/compute.d.ts" />
+/// <reference path="./lib/compute.d.ts" />
 
-import { Compute } from "../build/lib/compute.js";
+import { Compute } from "./lib/compute.js";
 
 (async ()=>{
     let canvas: HTMLCanvasElement = document.querySelector("#canvas");
@@ -12,7 +12,7 @@ import { Compute } from "../build/lib/compute.js";
         image.onload=resolve;
         image.onerror=reject;
     });
-    image.src = "assets/images/test.png";
+    image.src = "images/test.png";
     await promise;
 
     // 
@@ -32,7 +32,7 @@ import { Compute } from "../build/lib/compute.js";
     // grayscale compute shader
     const computePipeline = device.createComputePipeline({
         layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }),
-        computeStage: { entryPoint: "main", module: device.createShaderModule({ code: new Uint32Array(await (await fetch("./build/shaders/grayscale.comp.spv")).arrayBuffer()) }) }
+        computeStage: { entryPoint: "main", module: device.createShaderModule({ code: new Uint32Array(await (await fetch("./shaders/grayscale.comp.spv")).arrayBuffer()) }) }
     });
 
     // 

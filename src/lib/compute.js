@@ -5,13 +5,13 @@
 //if (typeof require != "undefined") fs = require("fs");
 
 let ThreadCode = (support = ``)=>{ return `
+//const { Worker, isMainThread, parentPort, workerData} = typeof require != "undefined" ? require('worker_threads') : { Worker, isMainThread: false, parentPort: this, workerData: {} };
+
 let instance = null, threads = 1, id = 0;
 //let table = new WebAssembly.Table({initial: 1, maximum: 65536, shared: true, element: "anyfunc"});
 
 // thread native dispatcher 
 this.onmessage = async (e)=>{
-    const { Worker, isMainThread, parentPort, workerData} = typeof require != "undefined" ? require('worker_threads') : { Worker, isMainThread: false, parentPort: this, workerData: {} };
-    
     let result = null;
     
     if (e.data.type == "init") {

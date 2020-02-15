@@ -6,7 +6,7 @@ module.exports = (entry = {[webgpu]: `./${webgpu}.ts`, [grayscale]: `./${graysca
 	context: path.join(__dirname, 'src'), entry,
 	output: {
 		filename: `[name].js`,
-		path: path.resolve(__dirname, 'build')
+		path: path.resolve(__dirname, 'public')
 	},
 	resolve: {
 		extensions: [ '.ts', '.tsx' ]
