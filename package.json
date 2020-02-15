@@ -1,9 +1,9 @@
 {
   "scripts": {
-    "asbuild:untouched": "asc src/assembly/index.ts -b build/assembly/untouched.wasm -t build/assembly/untouched.wat --sourceMap --validate --debug    --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd",
-    "asbuild:optimized": "asc src/assembly/index.ts -b build/assembly/optimized.wasm -t build/assembly/optimized.wat --sourceMap --validate --optimize --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd",
-    "vkbuild:untouched": "asc src/assembly/pukan.ts -b build/assembly/pukan-unt.wasm -t build/assembly/pukan-unt.wat --sourceMap --validate --debug    --runtime full --importMemory --enable bulk-memory,threads,sign-extension,simd",
-    "vkbuild:optimized": "asc src/assembly/pukan.ts -b build/assembly/pukan-opt.wasm -t build/assembly/pukan-opt.wat --sourceMap --validate --optimize --runtime full --importMemory --enable bulk-memory,threads,sign-extension,simd",
+    "asbuild:untouched": "asc src/assembly/index.ts -b public/assembly/untouched.wasm -t public/assembly/untouched.wat --sourceMap --validate --debug    --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd",
+    "asbuild:optimized": "asc src/assembly/index.ts -b public/assembly/optimized.wasm -t public/assembly/optimized.wat --sourceMap --validate --optimize --runtime full --importMemory --sharedMemory 65536 --enable bulk-memory,threads,sign-extension,simd",
+    "vkbuild:untouched": "asc src/assembly/pukan.ts -b public/assembly/pukan-unt.wasm -t public/assembly/pukan-unt.wat --sourceMap --validate --debug    --runtime full --importMemory --enable bulk-memory,threads,sign-extension,simd",
+    "vkbuild:optimized": "asc src/assembly/pukan.ts -b public/assembly/pukan-opt.wasm -t public/assembly/pukan-opt.wat --sourceMap --validate --optimize --runtime full --importMemory --enable bulk-memory,threads,sign-extension,simd",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
     "vkbuild": "npm run vkbuild:untouched && npm run vkbuild:optimized",
     "start": "npm i && npm run build && npm run dev",
