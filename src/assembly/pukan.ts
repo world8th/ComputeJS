@@ -91,6 +91,11 @@ function mUSizePtr(local: usize): gptr_t {
 };
 
 // 
+export function allocate(m: u32): ArrayBuffer {
+    return new ArrayBuffer(m);
+}
+
+// 
 export function setMemAddress(a: u32, b: u32): void {
     memAddress32x2.a = a, memAddress32x2.b = b;
     store<u64>(changetype<lptr_t>(memAddress64x1), load<u64>(changetype<lptr_t>(memAddress32x2)));
@@ -112,7 +117,8 @@ export function start(): void {
     let engineName = Uint8Array.wrap(String.UTF8.encode("No Engine"));
 
     // 
-    let appInfo: VkApplicationInfo = {
+    let appPtr: ArrayBuffer = new ArrayBuffer(offsetof<VkApplicationInfo>());
+    let appInfo: VkApplicationInfo = changetype<VkApplicationInfo>(appPtr);/*{
         sType: 0,
         pNext: 0,
         pApplicationName: mUSizePtr(changetype<lptr_t>(applicationName)),
@@ -120,28 +126,45 @@ export function start(): void {
         pEngineName: mUSizePtr(changetype<lptr_t>(engineName)),
         engineVersion: VK_MAKE_VERSION(1, 0, 0),
         apiVersion: VK_API_VERSION_1_1
-    };
+    };*/
+    appInfo.sType = 0;
+    appInfo.pNext = 0;
+    appInfo.pApplicationName = mUSizePtr(changetype<lptr_t>(applicationName));
+    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.pEngineName = mUSizePtr(changetype<lptr_t>(engineName));
+    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.apiVersion = VK_API_VERSION_1_1;
 
     // 
     let validationLayers   : u32x2 = { a: 0, b: 0 };
     let instanceExtensions : u32x2 = { a: 0, b: 0 };
-    let instanceInfo: VkInstanceCreateInfo = {
+    let instancePtr: ArrayBuffer = new ArrayBuffer(offsetof<VkInstanceCreateInfo>());
+    let instanceInfo: VkInstanceCreateInfo = changetype<VkInstanceCreateInfo>(instancePtr);/*{
         sType: 1, pNext: 0, flags: 0, 
         pApplicationInfo: mUSizePtr(changetype<lptr_t>(appInfo)),
         enabledLayerCount: instlayers.length,
         ppEnabledLayerNames: mUSizePtr(changetype<lptr_t>(instlayers)),
         enabledExtensionCount: extensions.length,
         ppEnabledExtensionNames: mUSizePtr(changetype<lptr_t>(extensions))
-    };
+    };*/
+
+    instanceInfo.sType = 1;
+    instanceInfo.pNext = 0;
+    instanceInfo.flags = 0;
+    instanceInfo.pApplicationInfo = mUSizePtr(changetype<lptr_t>(appInfo));
+    instanceInfo.enabledLayerCount = instlayers.length;
+    instanceInfo.ppEnabledLayerNames = mUSizePtr(changetype<lptr_t>(instlayers));
+    instanceInfo.enabledExtensionCount = extensions.length;
+    instanceInfo.ppEnabledExtensionNames = mUSizePtr(changetype<lptr_t>(extensions));
 
     // 
     let result = vkCreateInstance(changetype<lptr_t>(instanceInfo), 0, changetype<lptr_t>(instance));
     if (result !== 0) throw `Failed to create VkInstance!`;
     
     // 
-    let amountOfLayers: u32 = 0;
-    vkEnumerateInstanceLayerProperties(changetype<lptr_t>(amountOfLayers), 0);
-    let layers: VkLayerProperties[] = new Array<VkLayerProperties>(amountOfLayers);
-    vkEnumerateInstanceLayerProperties(changetype<lptr_t>(amountOfLayers), changetype<lptr_t>(layers));
+    //let amountOfLayers: u32 = 0;
+    //vkEnumerateInstanceLayerProperties(changetype<lptr_t>(amountOfLayers), 0);
+    //let layers: VkLayerProperties[] = new Array<VkLayerProperties>(amountOfLayers);
+    //vkEnumerateInstanceLayerProperties(changetype<lptr_t>(amountOfLayers), changetype<lptr_t>(layers));
 
 };

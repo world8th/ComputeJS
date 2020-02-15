@@ -58,6 +58,7 @@
 
     // 
     let memory = new WebAssembly.Memory({initial: 1, maximum: 65536, shared: true}); // Avoid TypeScript issues
+    let minsta = {};
 
     // safer import (try use Vulkan bindings in WebAssembly with AssemblyScript)
     const VK = {
@@ -182,6 +183,7 @@ console.log(`VkApplicationInfo {
     let cmodule = null, vmodule = null;
     try { cmodule = WebAssembly.instantiate(module, {env, pukan}); } catch(e) { console.error(e); };
     try { vmodule = module ? (await cmodule) : { exports: {} }; } catch(e) { console.error(e); };
+    minsta = vmodule;
 
     // 
     let address = memory.buffer.getAddress();
