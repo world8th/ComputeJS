@@ -15,13 +15,15 @@
  (data (i32.const 128) "\1e\00\00\00\01\00\00\00\01\00\00\00\1e\00\00\00~\00l\00i\00b\00/\00r\00t\00/\00p\00u\00r\00e\00.\00t\00s")
  (data (i32.const 176) "\1c\00\00\00\01\00\00\00\01\00\00\00\1c\00\00\00I\00n\00v\00a\00l\00i\00d\00 \00l\00e\00n\00g\00t\00h")
  (data (i32.const 224) "&\00\00\00\01\00\00\00\01\00\00\00&\00\00\00~\00l\00i\00b\00/\00a\00r\00r\00a\00y\00b\00u\00f\00f\00e\00r\00.\00t\00s")
- (data (i32.const 288) "\10\00\00\00\01\00\00\00\01\00\00\00\10\00\00\00A\00p\00p\00 \00G\00a\00m\00e")
- (data (i32.const 320) "\1c\00\00\00\01\00\00\00\01\00\00\00\1c\00\00\00~\00l\00i\00b\00/\00s\00t\00r\00i\00n\00g\00.\00t\00s")
- (data (i32.const 368) "$\00\00\00\01\00\00\00\01\00\00\00$\00\00\00I\00n\00d\00e\00x\00 \00o\00u\00t\00 \00o\00f\00 \00r\00a\00n\00g\00e")
- (data (i32.const 432) "$\00\00\00\01\00\00\00\01\00\00\00$\00\00\00~\00l\00i\00b\00/\00t\00y\00p\00e\00d\00a\00r\00r\00a\00y\00.\00t\00s")
- (data (i32.const 496) "\12\00\00\00\01\00\00\00\01\00\00\00\12\00\00\00N\00o\00 \00E\00n\00g\00i\00n\00e")
- (data (i32.const 544) "*\00\00\00\01\00\00\00\01\00\00\00*\00\00\00s\00r\00c\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00p\00u\00k\00a\00n\00.\00t\00s")
- (data (i32.const 608) "\06\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\001\00\00\00\02")
+ (data (i32.const 288) "L\00\00\00\01\00\00\00\01\00\00\00L\00\00\00V\00K\00_\00K\00H\00R\00_\00g\00e\00t\00_\00p\00h\00y\00s\00i\00c\00a\00l\00_\00d\00e\00v\00i\00c\00e\00_\00p\00r\00o\00p\00e\00r\00t\00i\00e\00s\002")
+ (data (i32.const 384) "\1c\00\00\00\01\00\00\00\01\00\00\00\1c\00\00\00~\00l\00i\00b\00/\00s\00t\00r\00i\00n\00g\00.\00t\00s")
+ (data (i32.const 432) "$\00\00\00\01\00\00\00\01\00\00\00$\00\00\00I\00n\00d\00e\00x\00 \00o\00u\00t\00 \00o\00f\00 \00r\00a\00n\00g\00e")
+ (data (i32.const 496) "$\00\00\00\01\00\00\00\01\00\00\00$\00\00\00~\00l\00i\00b\00/\00t\00y\00p\00e\00d\00a\00r\00r\00a\00y\00.\00t\00s")
+ (data (i32.const 560) "6\00\00\00\01\00\00\00\01\00\00\006\00\00\00V\00K\00_\00L\00A\00Y\00E\00R\00_\00K\00H\00R\00O\00N\00O\00S\00_\00v\00a\00l\00i\00d\00a\00t\00i\00o\00n")
+ (data (i32.const 640) "\10\00\00\00\01\00\00\00\01\00\00\00\10\00\00\00A\00p\00p\00 \00G\00a\00m\00e")
+ (data (i32.const 672) "\12\00\00\00\01\00\00\00\01\00\00\00\12\00\00\00N\00o\00 \00E\00n\00g\00i\00n\00e")
+ (data (i32.const 720) "*\00\00\00\01\00\00\00\01\00\00\00*\00\00\00s\00r\00c\00/\00a\00s\00s\00e\00m\00b\00l\00y\00/\00p\00u\00k\00a\00n\00.\00t\00s")
+ (data (i32.const 784) "\06\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\00\10\00\00\00\00\00\00\001\00\00\00\02")
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (import "env" "showValue" (func $src/assembly/pukan/showValue (param i32)))
  (import "env" "globalify" (func $src/assembly/pukan/globalify (param i32 i32) (result i32)))
@@ -35,7 +37,7 @@
  (global $src/assembly/pukan/memAddress64x1 (mut i32) (i32.const 0))
  (global $src/assembly/pukan/last64 (mut i32) (i32.const 0))
  (global $~argumentsLength (mut i32) (i32.const 0))
- (global $~lib/rt/__rtti_base i32 (i32.const 608))
+ (global $~lib/rt/__rtti_base i32 (i32.const 784))
  (export "__setArgumentsLength" (func $~setArgumentsLength))
  (export "memory" (memory $0))
  (export "__alloc" (func $~lib/rt/tlsf/__alloc))
@@ -635,11 +637,11 @@
    if
     unreachable
    end
-   i32.const 672
+   i32.const 848
    local.tee $0
    i32.const 0
    i32.store
-   i32.const 2240
+   i32.const 2416
    i32.const 0
    i32.store
    loop $for-loop|0
@@ -650,7 +652,7 @@
      local.get $1
      i32.const 2
      i32.shl
-     i32.const 672
+     i32.const 848
      i32.add
      i32.const 0
      i32.store offset=4
@@ -668,7 +670,7 @@
        i32.add
        i32.const 2
        i32.shl
-       i32.const 672
+       i32.const 848
        i32.add
        i32.const 0
        i32.store offset=96
@@ -686,13 +688,13 @@
      br $for-loop|0
     end
    end
-   i32.const 672
-   i32.const 2256
+   i32.const 848
+   i32.const 2432
    memory.size
    i32.const 16
    i32.shl
    call $~lib/rt/tlsf/addMemory
-   i32.const 672
+   i32.const 848
    global.set $~lib/rt/tlsf/ROOT
   end
   local.get $0
@@ -1119,7 +1121,7 @@
  )
  (func $~lib/rt/pure/__retain (; 16 ;) (param $0 i32) (result i32)
   local.get $0
-  i32.const 660
+  i32.const 836
   i32.gt_u
   if
    local.get $0
@@ -1131,7 +1133,7 @@
  )
  (func $~lib/rt/pure/__release (; 17 ;) (param $0 i32)
   local.get $0
-  i32.const 660
+  i32.const 836
   i32.gt_u
   if
    local.get $0
@@ -1246,72 +1248,79 @@
   i32.sub
   i32.load offset=12
   i32.add
-  local.set $2
+  local.set $3
+  i32.const 1
+  local.set $1
   loop $while-continue|0
    local.get $0
-   local.get $2
+   local.get $3
    i32.lt_u
    if
-    local.get $0
-    i32.load16_u
-    local.tee $3
-    i32.const 128
-    i32.lt_u
-    if (result i32)
-     local.get $1
-     i32.const 1
-     i32.add
-    else
-     local.get $3
-     i32.const 2048
+    block $while-break|0
+     local.get $0
+     i32.load16_u
+     local.tee $2
+     i32.const 128
      i32.lt_u
      if (result i32)
+      local.get $2
+      i32.eqz
+      br_if $while-break|0
       local.get $1
-      i32.const 2
+      i32.const 1
       i32.add
      else
-      local.get $0
-      i32.const 2
-      i32.add
       local.get $2
+      i32.const 2048
       i32.lt_u
-      i32.const 0
-      local.get $3
-      i32.const 64512
-      i32.and
-      i32.const 55296
-      i32.eq
-      select
-      if
+      if (result i32)
+       local.get $1
+       i32.const 2
+       i32.add
+      else
        local.get $0
-       i32.load16_u offset=2
+       i32.const 2
+       i32.add
+       local.get $3
+       i32.lt_u
+       i32.const 0
+       local.get $2
        i32.const 64512
        i32.and
-       i32.const 56320
+       i32.const 55296
        i32.eq
+       select
        if
-        local.get $1
-        i32.const 4
-        i32.add
-        local.set $1
         local.get $0
-        i32.const 4
-        i32.add
-        local.set $0
-        br $while-continue|0
+        i32.load16_u offset=2
+        i32.const 64512
+        i32.and
+        i32.const 56320
+        i32.eq
+        if
+         local.get $1
+         i32.const 4
+         i32.add
+         local.set $1
+         local.get $0
+         i32.const 4
+         i32.add
+         local.set $0
+         br $while-continue|0
+        end
        end
+       local.get $1
+       i32.const 3
+       i32.add
       end
-      local.get $1
-      i32.const 3
-      i32.add
      end
+     local.set $1
+     local.get $0
+     i32.const 2
+     i32.add
+     local.set $0
+     br $while-continue|0
     end
-    local.set $1
-    local.get $0
-    i32.const 2
-    i32.add
-    local.set $0
-    br $while-continue|0
    end
   end
   local.get $1
@@ -1339,6 +1348,8 @@
   local.tee $5
   local.get $0
   i32.add
+  i32.const 1
+  i32.sub
   local.set $6
   local.get $5
   local.set $0
@@ -1505,12 +1516,15 @@
   i32.gt_u
   if
    i32.const 0
-   i32.const 336
+   i32.const 400
    i32.const 703
    i32.const 6
    call $~lib/builtins/abort
    unreachable
   end
+  local.get $0
+  i32.const 0
+  i32.store8
   local.get $5
   call $~lib/rt/pure/__retain
  )
@@ -1524,8 +1538,8 @@
   local.tee $2
   i32.gt_u
   if
-   i32.const 384
    i32.const 448
+   i32.const 512
    i32.const 1741
    i32.const 4
    call $~lib/builtins/abort
@@ -1542,7 +1556,7 @@
     local.get $2
    else
     i32.const 192
-    i32.const 448
+    i32.const 512
     i32.const 1750
     i32.const 6
     call $~lib/builtins/abort
@@ -1555,7 +1569,7 @@
    i32.gt_s
    if
     i32.const 192
-    i32.const 448
+    i32.const 512
     i32.const 1755
     i32.const 6
     call $~lib/builtins/abort
@@ -1623,31 +1637,61 @@
   (local $7 i32)
   (local $8 i32)
   (local $9 i32)
+  (local $10 i32)
+  (local $11 i32)
+  (local $12 i32)
+  (local $13 i32)
   i32.const 64
   call $src/assembly/pukan/showValue
   i32.const 48
   call $src/assembly/pukan/showValue
-  i32.const 8
-  i32.const 0
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.tee $2
-  i64.const 0
-  i64.store
   i32.const 1
   global.set $~argumentsLength
   i32.const 304
   call $~lib/string/String.UTF8.encode
-  local.tee $8
+  local.tee $10
   call $~lib/typedarray/Uint8Array.wrap|trampoline
-  local.set $3
+  local.set $2
   i32.const 1
   global.set $~argumentsLength
-  i32.const 512
+  i32.const 576
   call $~lib/string/String.UTF8.encode
-  local.tee $9
+  local.tee $11
   call $~lib/typedarray/Uint8Array.wrap|trampoline
-  local.set $4
+  local.set $3
+  i32.const 32
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.tee $4
+  local.get $2
+  call $src/assembly/pukan/mUSizePtr
+  i64.store
+  i32.const 32
+  call $~lib/arraybuffer/ArrayBuffer#constructor
+  local.tee $5
+  local.get $3
+  call $src/assembly/pukan/mUSizePtr
+  i64.store
+  i32.const 8
+  i32.const 0
+  call $~lib/rt/tlsf/__alloc
+  call $~lib/rt/pure/__retain
+  local.tee $6
+  i64.const 0
+  i64.store
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 656
+  call $~lib/string/String.UTF8.encode
+  local.tee $12
+  call $~lib/typedarray/Uint8Array.wrap|trampoline
+  local.set $7
+  i32.const 1
+  global.set $~argumentsLength
+  i32.const 688
+  call $~lib/string/String.UTF8.encode
+  local.tee $13
+  call $~lib/typedarray/Uint8Array.wrap|trampoline
+  local.set $8
   i32.const 48
   call $~lib/arraybuffer/ArrayBuffer#constructor
   local.tee $1
@@ -1657,7 +1701,7 @@
   i64.const 0
   i64.store offset=8
   local.get $1
-  local.get $3
+  local.get $7
   call $src/assembly/pukan/mUSizePtr
   i64.store offset=16
   local.get $1
@@ -1665,7 +1709,7 @@
   call $src/assembly/pukan/VK_MAKE_VERSION
   i32.store offset=24
   local.get $1
-  local.get $4
+  local.get $8
   call $src/assembly/pukan/mUSizePtr
   i64.store offset=32
   local.get $1
@@ -1675,26 +1719,6 @@
   local.get $1
   global.get $src/assembly/pukan/VK_API_VERSION_1_1
   i32.store offset=44
-  i32.const 8
-  i32.const 3
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.tee $5
-  i32.const 0
-  i32.store
-  local.get $5
-  i32.const 0
-  i32.store offset=4
-  i32.const 8
-  i32.const 3
-  call $~lib/rt/tlsf/__alloc
-  call $~lib/rt/pure/__retain
-  local.tee $6
-  i32.const 0
-  i32.store
-  local.get $6
-  i32.const 0
-  i32.store offset=4
   i32.const 64
   call $~lib/arraybuffer/ArrayBuffer#constructor
   local.tee $0
@@ -1711,78 +1735,96 @@
   call $src/assembly/pukan/mUSizePtr
   i64.store offset=24
   local.get $0
-  i32.const 0
+  i32.const 1
   i32.store offset=32
   local.get $0
-  i64.const 0
+  local.get $5
+  call $src/assembly/pukan/mUSizePtr
   i64.store offset=40
   local.get $0
-  i32.const 0
+  i32.const 1
   i32.store offset=48
   local.get $0
-  i64.const 0
+  local.get $4
+  call $src/assembly/pukan/mUSizePtr
   i64.store offset=56
   i32.const 8
   i32.const 4
   call $~lib/rt/tlsf/__alloc
   call $~lib/rt/pure/__retain
-  local.tee $7
+  local.tee $9
   i32.const 1
   call $src/assembly/pukan/mUSizePtr
   i64.store
-  local.get $7
+  local.get $9
   call $src/assembly/pukan/showNumber64
   local.get $0
   i32.const 0
-  local.get $2
+  local.get $6
   call $src/assembly/pukan/vkCreateInstance
   if
+   local.get $10
+   call $~lib/rt/pure/__release
    local.get $2
    call $~lib/rt/pure/__release
-   local.get $8
+   local.get $11
    call $~lib/rt/pure/__release
    local.get $3
    call $~lib/rt/pure/__release
-   local.get $9
-   call $~lib/rt/pure/__release
    local.get $4
-   call $~lib/rt/pure/__release
-   local.get $1
    call $~lib/rt/pure/__release
    local.get $5
    call $~lib/rt/pure/__release
    local.get $6
    call $~lib/rt/pure/__release
-   local.get $0
+   local.get $12
    call $~lib/rt/pure/__release
    local.get $7
    call $~lib/rt/pure/__release
+   local.get $13
+   call $~lib/rt/pure/__release
+   local.get $8
+   call $~lib/rt/pure/__release
+   local.get $1
+   call $~lib/rt/pure/__release
+   local.get $0
+   call $~lib/rt/pure/__release
+   local.get $9
+   call $~lib/rt/pure/__release
    i32.const 0
-   i32.const 560
-   i32.const 171
+   i32.const 736
+   i32.const 181
    i32.const 22
    call $~lib/builtins/abort
    unreachable
   end
+  local.get $10
+  call $~lib/rt/pure/__release
   local.get $2
   call $~lib/rt/pure/__release
-  local.get $8
+  local.get $11
   call $~lib/rt/pure/__release
   local.get $3
   call $~lib/rt/pure/__release
-  local.get $9
-  call $~lib/rt/pure/__release
   local.get $4
-  call $~lib/rt/pure/__release
-  local.get $1
   call $~lib/rt/pure/__release
   local.get $5
   call $~lib/rt/pure/__release
   local.get $6
   call $~lib/rt/pure/__release
-  local.get $0
+  local.get $12
   call $~lib/rt/pure/__release
   local.get $7
+  call $~lib/rt/pure/__release
+  local.get $13
+  call $~lib/rt/pure/__release
+  local.get $8
+  call $~lib/rt/pure/__release
+  local.get $1
+  call $~lib/rt/pure/__release
+  local.get $0
+  call $~lib/rt/pure/__release
+  local.get $9
   call $~lib/rt/pure/__release
  )
  (func $~start (; 30 ;)
@@ -1880,7 +1922,7 @@
    local.tee $0
    if
     local.get $0
-    i32.const 660
+    i32.const 836
     i32.ge_u
     if
      local.get $0

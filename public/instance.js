@@ -118,12 +118,15 @@
                 "VK_LAYER_LUNARG_standard_validation",
                 "VK_LAYER_KHRONOS_validation"
             ];
-            //createInfo.sType = originInfo.sType;//VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-            //createInfo.pApplicationInfo = originInfo.pApplicationInfo;//appInfo;
-            //createInfo.ppEnabledLayerNames = originInfo.ppEnabledLayerNames;
-            //createInfo.enabledLayerCount = 0;//originInfo.enabledLayerCount;
-            //createInfo.ppEnabledExtensionNames = originInfo.ppEnabledExtensionNames;
-            //createInfo.enabledExtensionCount = 0;//originInfo.enabledExtensionCount;
+            let extensions = [
+                "VK_KHR_get_physical_device_properties2"
+            ];
+
+
+            createInfo.ppEnabledExtensionNames = extensions;
+            createInfo.enabledExtensionCount = extensions.length;
+            createInfo.ppEnabledLayerNames = validationLayers;
+            createInfo.enabledLayerCount = validationLayers.length;
 
             // DEBUG
             //VK.globalify(instanceCreateInfoAddress, local64Ptr);
@@ -132,7 +135,7 @@
             // 
             //console.log(toHexString(new Uint8Array(memory.buffer, instanceCreateInfoAddress+24, 8)));
             let uptr64 = u64p(memory.buffer, instanceCreateInfoAddress+24); console.log(uptr64);
-            createInfo.pApplicationInfo = new VkApplicationInfo({$memoryBuffer: memory.buffer, $memoryOffset: Number(localify(memory.buffer, uptr64))});
+            //createInfo.pApplicationInfo = new VkApplicationInfo({$memoryBuffer: memory.buffer, $memoryOffset: Number(localify(memory.buffer, uptr64))});
             
             // Currently, NVK working WRONG (I even Attemped to use global address hack)
             console.log(`VkInstanceCreateInfo {`);
@@ -149,18 +152,21 @@
             // 
             let appInfo = createInfo.pApplicationInfo;
             appInfo.reflect();
+            appInfo.pApplicationName = "Peregar";
+            appInfo.pEngineName = "Peregar";
 
             // Currently, NVK working WRONG (I even Attemped to use global address hack)
             console.log(`VkApplicationInfo {`);
             console.log(`   sType: ${appInfo.sType};`);
             console.log(`   pNext: ${appInfo.pNext};`);
-            console.log(`   pApplicationName: ${appInfo.pApplicationInfo};`);
+            console.log(`   pApplicationName: ${appInfo.pApplicationName};`);
             console.log(`   applicationVersion: ${appInfo.applicationVersion};`);
             console.log(`   pEngineName: ${appInfo.pEngineName};`);
             console.log(`   engineVersion: ${appInfo.engineVersion};`);
             console.log(`   apiVersion: ${appInfo.apiVersion};`);
             console.log(`};`);
 
+            // 
             let instance = new VkInstance({ $memoryOffset: instanceAddress, $memoryBuffer: memory.buffer });
             return vkCreateInstance(createInfo, allocatorAddress, instance);
         },

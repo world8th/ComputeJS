@@ -81,12 +81,31 @@ function ptr(local: usize): u64 {
 };
 
 // 
-class VkLayerProperties {
+@unmanaged class VkLayerProperties {
     layerName: gptr_t;
     specVersion: u32;
     implementationVersion: u32;
     description: u64;
 };
+
+
+
+// 
+@unmanaged class Extensions {
+    ptr0: u64;
+    ptr1: u64;
+    ptr2: u64;
+    ptr3: u64;
+};
+
+// 
+@unmanaged class Layers {
+    ptr0: u64;
+    ptr1: u64;
+    ptr2: u64;
+    ptr3: u64;
+};
+
 
 // 
 function mUSizePtr(local: usize): gptr_t {
@@ -109,28 +128,29 @@ export function setMemAddress(a: u32, b: u32): void {
 export function start(): void {
     showValue(offsetof<VkInstanceCreateInfo>());
     showValue(offsetof<VkApplicationInfo>());
-    
 
     // 
-    //let extensions: lptr_t = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_KHR_get_physical_device_properties2")));
-    //let instlayers: lptr_t = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_LAYER_KHRONOS_validation")));
-    
+    let physicalDeviceProperties2: lptr_t = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_KHR_get_physical_device_properties2", true)));
+    let khronosValidation: lptr_t = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_LAYER_KHRONOS_validation", true)));
+
+    // extension
+    let extensionsPtr: ArrayBuffer = new ArrayBuffer(offsetof<Extensions>());
+    let extensions: Extensions = changetype<Extensions>(extensionsPtr);
+    extensions.ptr0 = mUSizePtr(physicalDeviceProperties2);
+
+    // layers
+    let instlayersPtr: ArrayBuffer = new ArrayBuffer(offsetof<Layers>());
+    let instlayers: Layers = changetype<Layers>(instlayersPtr);
+    instlayers.ptr0 = mUSizePtr(khronosValidation);
+
     // 
     let instance: VkInstance = {handle: 0};
-    let applicationName = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("App Game")));
-    let engineName = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("No Engine")));
+    let applicationName = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("App Game", true)));
+    let engineName = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("No Engine", true)));
 
     // 
     let appPtr: ArrayBuffer = new ArrayBuffer(offsetof<VkApplicationInfo>());
-    let appInfo: VkApplicationInfo = changetype<VkApplicationInfo>(appPtr);/*{
-        sType: 0,
-        pNext: 0,
-        pApplicationName: mUSizePtr(changetype<lptr_t>(applicationName)),
-        applicationVersion: VK_MAKE_VERSION(1, 0, 0),
-        pEngineName: mUSizePtr(changetype<lptr_t>(engineName)),
-        engineVersion: VK_MAKE_VERSION(1, 0, 0),
-        apiVersion: VK_API_VERSION_1_1
-    };*/
+    let appInfo: VkApplicationInfo = changetype<VkApplicationInfo>(appPtr);
     appInfo.sType = 0;
     appInfo.pNext = 0;
     appInfo.pApplicationName = mUSizePtr(applicationName);
@@ -140,26 +160,16 @@ export function start(): void {
     appInfo.apiVersion = VK_API_VERSION_1_1;
 
     // 
-    let validationLayers   : u32x2 = { a: 0, b: 0 };
-    let instanceExtensions : u32x2 = { a: 0, b: 0 };
     let instancePtr: ArrayBuffer = new ArrayBuffer(offsetof<VkInstanceCreateInfo>());
-    let instanceInfo: VkInstanceCreateInfo = changetype<VkInstanceCreateInfo>(instancePtr);/*{
-        sType: 1, pNext: 0, flags: 0, 
-        pApplicationInfo: mUSizePtr(changetype<lptr_t>(appInfo)),
-        enabledLayerCount: instlayers.length,
-        ppEnabledLayerNames: mUSizePtr(changetype<lptr_t>(instlayers)),
-        enabledExtensionCount: extensions.length,
-        ppEnabledExtensionNames: mUSizePtr(changetype<lptr_t>(extensions))
-    };*/
-
+    let instanceInfo: VkInstanceCreateInfo = changetype<VkInstanceCreateInfo>(instancePtr);
     instanceInfo.sType = 1;
     instanceInfo.pNext = 0;
     instanceInfo.flags = 0;
     instanceInfo.pApplicationInfo = mUSizePtr(changetype<lptr_t>(appInfo));
-    instanceInfo.enabledLayerCount = 0; //instlayers.length;
-    instanceInfo.ppEnabledLayerNames = 0; //mUSizePtr(changetype<lptr_t>(instlayers));
-    instanceInfo.enabledExtensionCount = 0; //extensions.length;
-    instanceInfo.ppEnabledExtensionNames = 0; //mUSizePtr(changetype<lptr_t>(extensions));
+    instanceInfo.enabledLayerCount = 1;
+    instanceInfo.ppEnabledLayerNames = mUSizePtr(changetype<lptr_t>(instlayers));
+    instanceInfo.enabledExtensionCount = 1;
+    instanceInfo.ppEnabledExtensionNames = mUSizePtr(changetype<lptr_t>(extensions));
 
     // DEBUG for 
     let a: u64x1 = { a: mUSizePtr(1) };
