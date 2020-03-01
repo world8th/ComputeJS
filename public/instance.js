@@ -46,34 +46,45 @@
     console.log("compute done!");
 */
 
+    let u64g = (num) => {
+        return new BigUint64Array([BigInt(num)])[0];
+    };
+
+    let u64p = (mem, adr) => {
+        return new DataView(mem, adr, 8).getBigUint64(0, true);
+    };
+
+    let u64s = (mem, adr, num) => {
+        new DataView(mem, adr, 8).setBigUint64(0, BigInt(num), true);
+    };
+
     // Used for INPUT to GPU's processing 
     let globalify = (memory, offset) => {
-        return (memory.getAddress() + BigInt(offset))[0];
+        let gMem = memory.getAddress() + BigInt(offset); 
+        console.log(`memoryAddress:${memory.getAddress()} + localAddress:${offset} = ${gMem}`);
+        return gMem;
     };
 
     // Used for READ from GPU's processing 
     let localify = (memory, address) => {
-        return Number(BigInt(address) - memory.getAddress());
+        let lMem = u64g(address) - u64g(memory.getAddress());
+        console.log(`nativeAddress:${u64g(address)} - memoryAddress:${u64g(memory.getAddress())} = ${lMem}`);
+        return lMem;
     };
 
     // 
     let memory = new WebAssembly.Memory({initial: 1, maximum: 65536, shared: true}); // Avoid TypeScript issues
     let minsta = {};
+    let local64Ptr = 0;
 
     // safer import (try use Vulkan bindings in WebAssembly with AssemblyScript)
     const VK = {
-        /*
-        mInt64Ptr: (localAddress) => {
-            return globalify(memory.buffer, localAddress);
-        },
-
-        mUSizePtr: (localAddress) => {
-            return globalify(memory.buffer, BigInt(localAddress));
-        },*/
-
-        globalify: (localAddress, pointerToU64) => {
-            let U64 = new BigUint64Array(memory.buffer,pointerToU64,1);
-            U64[0] = BigInt(localAddress) + memory.buffer.getAddress(); // make application pointer (un-safe)
+        globalify: (localAddressA, pointerToU64) => {
+            let localAddress = 0; // UN-PREFER
+            //let U64 = new BigUint64Array(memory.buffer,pointerToU64,1);
+            //U64[0] = BigInt(localAddress) + memory.buffer.getAddress(); // make application pointer (un-safe)
+            u64s(memory.buffer, local64Ptr = pointerToU64, u64g(localAddress) + memory.buffer.getAddress());
+            console.log(`memoryAddress:${memory.buffer.getAddress()} + localAddress:${u64g(localAddressA)} = ${u64p(memory.buffer, pointerToU64)}`);
             return localAddress;
         },
 
@@ -89,9 +100,9 @@
             console.log("sizeof(VkApplicationInfo) = ", VkApplicationInfo.byteLength);
 
             let createInfo = new VkInstanceCreateInfo({$memoryBuffer: memory.buffer, $memoryOffset:instanceCreateInfoAddress});
-            //let createInfo = new VkInstanceCreateInfo(); // Directly Still UNABLE
+            createInfo.reflect();
 
-            let appInfo = createInfo.pApplicationInfo;
+            //let appInfo = createInfo.pApplicationInfo;
             //appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
             //appInfo.pApplicationName = "App";
             //appInfo.applicationVersion = VK_MAKE_VERSION(1, 1, 0);
@@ -109,35 +120,47 @@
             //createInfo.enabledLayerCount = 0;//originInfo.enabledLayerCount;
             //createInfo.ppEnabledExtensionNames = originInfo.ppEnabledExtensionNames;
             //createInfo.enabledExtensionCount = 0;//originInfo.enabledExtensionCount;
+
+            // DEBUG
+            //VK.globalify(instanceCreateInfoAddress, local64Ptr);
+            console.log(`Attemp to restore original memory Address: ${ u64p(memory.buffer, local64Ptr) }`);
+
+            // 
+            //console.log(toHexString(new Uint8Array(memory.buffer, instanceCreateInfoAddress+24, 8)));
+            let uptr64 = u64p(memory.buffer, instanceCreateInfoAddress+24); console.log(uptr64);
+            createInfo.pApplicationInfo = new VkApplicationInfo({$memoryBuffer: memory.buffer, $memoryOffset: Number(localify(memory.buffer, uptr64))});
+
+
+
             
 // Currently, NVK working WRONG (I even Attemped to use global address hack)
-console.log(`VkInstanceCreateInfo {
-    sType: ${createInfo.sType};
-    pNext: ${createInfo.pNext};
-    flags: ${createInfo.flags};
-    pApplicationInfo: ${createInfo.pApplicationInfo};
-    enabledLayerCount: ${createInfo.enabledLayerCount};
-    ppEnabledLayerNames: ${createInfo.ppEnabledLayerNames};
-    enabledExtensionCount: ${createInfo.enabledExtensionCount};
-    ppEnabledExtensionNames: ${createInfo.ppEnabledExtensionNames};
-};`);
+console.log(`VkInstanceCreateInfo {`);
+console.log(`   sType: ${createInfo.sType};`);
+console.log(`   pNext: ${createInfo.pNext};`);
+console.log(`   flags: ${createInfo.flags};`);
+console.log(`   pApplicationInfo: ${createInfo.pApplicationInfo};`);
+console.log(`   enabledLayerCount: ${createInfo.enabledLayerCount};`);
+console.log(`   ppEnabledLayerNames: ${createInfo.ppEnabledLayerNames};`);
+console.log(`   enabledExtensionCount: ${createInfo.enabledExtensionCount};`);
+console.log(`   ppEnabledExtensionNames: ${createInfo.ppEnabledExtensionNames};`);
+console.log(`};`);
 
 // Currently, NVK working WRONG (I even Attemped to use global address hack)
-console.log(`VkApplicationInfo {
-    sType: ${appInfo.sType};
-    pNext: ${appInfo.pNext};
-    pApplicationName: ${appInfo.pApplicationInfo};
-    applicationVersion: ${appInfo.pApplicationName};
-    pEngineName: ${appInfo.pEngineName};
-    engineVersion: ${appInfo.engineVersion};
-    apiVersion: ${appInfo.apiVersion};
-};`);
-            
+console.log(`VkApplicationInfo {`);
+console.log(`   sType: ${appInfo.sType};`);
+console.log(`   pNext: ${appInfo.pNext};`);
+console.log(`   pApplicationName: ${appInfo.pApplicationInfo};`);
+console.log(`   applicationVersion: ${appInfo.pApplicationName};`);
+console.log(`   pEngineName: ${appInfo.pEngineName};`);
+console.log(`   engineVersion: ${appInfo.engineVersion};`);
+console.log(`   apiVersion: ${appInfo.apiVersion};`);
+console.log(`};`);
+
             let instance = new VkInstance({ $memoryOffset: instanceAddress, $memoryBuffer: memory.buffer });
             return vkCreateInstance(createInfo, allocatorAddress, instance);
         },
         
-        vkEnumerateInstanceLayerProperties: (amountOfLayersAddress, layerPropertiesAddress) =>{
+        vkEnumerateInstanceLayerProperties: (amountOfLayersAddress, layerPropertiesAddress) => {
             return 0;
             //return vkEnumerateInstanceLayerProperties({$:new Uint32Array(memory.buffer,amountOfLayersAddress,1)}, VkLayerProperties({$memoryBuffer:memory.buffer, $memoryOffset:layerPropertiesAddress}));
         }

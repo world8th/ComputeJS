@@ -43,11 +43,11 @@ declare function showNumber(size: u32): void;
 declare function globalify(local: usize, pt64: usize): usize; // pt64 is output with global pointer 
 
 // 
-let last64: u64[] = [0];
+let last64: u64[] = [0,0];
 
 // 
 function ptr(local: usize): u64 {
-    globalify(local, changetype<usize>(last64)); return last64[0];
+    globalify(local, changetype<usize>(last64)); return (last64[0]+<u64>(local));
 }
 
 // 
@@ -55,25 +55,25 @@ function ptr(local: usize): u64 {
 
 // 
 @unmanaged class VkApplicationInfo {
-    @offset(0x0) sType: u32;
-    @offset(0x8) pNext: gptr_t;
-    @offset(0x10) pApplicationName: gptr_t;
-    @offset(0x18) applicationVersion: u32;
-    @offset(0x20) pEngineName: gptr_t;
-    @offset(0x28) engineVersion: u32;
-    @offset(0x2C) apiVersion: u32;
+    sType: u32;
+    pNext: gptr_t;
+    pApplicationName: gptr_t;
+    applicationVersion: u32;
+    pEngineName: gptr_t;
+    engineVersion: u32;
+    apiVersion: u32;
 };
 
 // 
 @unmanaged class VkInstanceCreateInfo {
-    @offset(0x0) sType: u32;
-    @offset(0x8) pNext: gptr_t;
-    @offset(0x10) flags: u32;
-    @offset(0x18) pApplicationInfo: gptr_t;
-    @offset(0x20) enabledLayerCount: u32;
-    @offset(0x28) ppEnabledLayerNames: gptr_t;
-    @offset(0x30) enabledExtensionCount: u32;
-    @offset(0x38) ppEnabledExtensionNames: gptr_t;
+    sType: u32;
+    pNext: gptr_t;
+    flags: u32;
+    pApplicationInfo: gptr_t;
+    enabledLayerCount: u32;
+    ppEnabledLayerNames: gptr_t;
+    enabledExtensionCount: u32;
+    ppEnabledExtensionNames: gptr_t;
 };
 
 // 
@@ -157,7 +157,11 @@ export function start(): void {
     instanceInfo.enabledExtensionCount = extensions.length;
     instanceInfo.ppEnabledExtensionNames = mUSizePtr(changetype<lptr_t>(extensions));
 
+    // DEBUG for 
+    mUSizePtr(0);
+
     // 
+    //let result = vkCreateInstance(changetype<lptr_t>(instanceInfo), 0, changetype<lptr_t>(instance));
     let result = vkCreateInstance(changetype<lptr_t>(instanceInfo), 0, changetype<lptr_t>(instance));
     if (result !== 0) throw `Failed to create VkInstance!`;
     
