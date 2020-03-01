@@ -35,19 +35,23 @@ declare function vkCreateInstance(instanceInfo: lptr_t, allocator: lptr_t, point
 declare function vkEnumerateInstanceLayerProperties(amount: lptr_t, layerProperties: lptr_t): VkResult;
 
 // 
-@external("env", "showNumber")
-declare function showNumber(size: u32): void;
+@external("env", "showValue")
+declare function showValue(size: u32): void;
+
+// 
+@external("env", "showNumber64")
+declare function showNumber64(size: lptr_t): void;
 
 //
 @external("env", "globalify")
 declare function globalify(local: usize, pt64: usize): usize; // pt64 is output with global pointer 
 
 // 
-let last64: u64[] = [0,0];
+let last64: u64x1 = { a: 0 };
 
 // 
 function ptr(local: usize): u64 {
-    globalify(local, changetype<usize>(last64)); return (last64[0]+<u64>(local));
+    globalify(local, changetype<usize>(last64)); return (last64.a+<u64>(local));
 }
 
 // 
@@ -103,18 +107,18 @@ export function setMemAddress(a: u32, b: u32): void {
 
 // 
 export function start(): void {
-    showNumber(offsetof<VkInstanceCreateInfo>());
-    showNumber(offsetof<VkApplicationInfo>());
+    showValue(offsetof<VkInstanceCreateInfo>());
+    showValue(offsetof<VkApplicationInfo>());
     
 
     // 
-    let extensions: gptr_t[] = [ mUSizePtr(changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_KHR_get_physical_device_properties2")))) ];
-    let instlayers: gptr_t[] = [ mUSizePtr(changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_LAYER_KHRONOS_validation")))) ];
+    //let extensions: lptr_t = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_KHR_get_physical_device_properties2")));
+    //let instlayers: lptr_t = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("VK_LAYER_KHRONOS_validation")));
     
     // 
     let instance: VkInstance = {handle: 0};
-    let applicationName = Uint8Array.wrap(String.UTF8.encode("App Game"));
-    let engineName = Uint8Array.wrap(String.UTF8.encode("No Engine"));
+    let applicationName = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("App Game")));
+    let engineName = changetype<lptr_t>(Uint8Array.wrap(String.UTF8.encode("No Engine")));
 
     // 
     let appPtr: ArrayBuffer = new ArrayBuffer(offsetof<VkApplicationInfo>());
@@ -129,9 +133,9 @@ export function start(): void {
     };*/
     appInfo.sType = 0;
     appInfo.pNext = 0;
-    appInfo.pApplicationName = mUSizePtr(changetype<lptr_t>(applicationName));
+    appInfo.pApplicationName = mUSizePtr(applicationName);
     appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.pEngineName = mUSizePtr(changetype<lptr_t>(engineName));
+    appInfo.pEngineName = mUSizePtr(engineName);
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_API_VERSION_1_1;
 
@@ -152,13 +156,14 @@ export function start(): void {
     instanceInfo.pNext = 0;
     instanceInfo.flags = 0;
     instanceInfo.pApplicationInfo = mUSizePtr(changetype<lptr_t>(appInfo));
-    instanceInfo.enabledLayerCount = instlayers.length;
-    instanceInfo.ppEnabledLayerNames = mUSizePtr(changetype<lptr_t>(instlayers));
-    instanceInfo.enabledExtensionCount = extensions.length;
-    instanceInfo.ppEnabledExtensionNames = mUSizePtr(changetype<lptr_t>(extensions));
+    instanceInfo.enabledLayerCount = 0; //instlayers.length;
+    instanceInfo.ppEnabledLayerNames = 0; //mUSizePtr(changetype<lptr_t>(instlayers));
+    instanceInfo.enabledExtensionCount = 0; //extensions.length;
+    instanceInfo.ppEnabledExtensionNames = 0; //mUSizePtr(changetype<lptr_t>(extensions));
 
     // DEBUG for 
-    mUSizePtr(0);
+    let a: u64x1 = { a: mUSizePtr(1) };
+    showNumber64(changetype<lptr_t>(a));
 
     // 
     //let result = vkCreateInstance(changetype<lptr_t>(instanceInfo), 0, changetype<lptr_t>(instance));

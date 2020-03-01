@@ -88,8 +88,12 @@
             return localAddress;
         },
 
-        showNumber: (size) => {
-            console.log("DEBUG:" + size);
+        showValue: (size) => {
+            console.log("DEBUG: " + size);
+        },
+
+        showNumber64: (lptr) => {
+            console.log("ADDRESS: " + u64p(memory.buffer, lptr));
         },
 
         vkCreateInstance: (instanceCreateInfoAddress, allocatorAddress, instanceAddress) => { // will skipe pointer instance directly into...
@@ -129,32 +133,33 @@
             //console.log(toHexString(new Uint8Array(memory.buffer, instanceCreateInfoAddress+24, 8)));
             let uptr64 = u64p(memory.buffer, instanceCreateInfoAddress+24); console.log(uptr64);
             createInfo.pApplicationInfo = new VkApplicationInfo({$memoryBuffer: memory.buffer, $memoryOffset: Number(localify(memory.buffer, uptr64))});
-
-
-
             
-// Currently, NVK working WRONG (I even Attemped to use global address hack)
-console.log(`VkInstanceCreateInfo {`);
-console.log(`   sType: ${createInfo.sType};`);
-console.log(`   pNext: ${createInfo.pNext};`);
-console.log(`   flags: ${createInfo.flags};`);
-console.log(`   pApplicationInfo: ${createInfo.pApplicationInfo};`);
-console.log(`   enabledLayerCount: ${createInfo.enabledLayerCount};`);
-console.log(`   ppEnabledLayerNames: ${createInfo.ppEnabledLayerNames};`);
-console.log(`   enabledExtensionCount: ${createInfo.enabledExtensionCount};`);
-console.log(`   ppEnabledExtensionNames: ${createInfo.ppEnabledExtensionNames};`);
-console.log(`};`);
+            // Currently, NVK working WRONG (I even Attemped to use global address hack)
+            console.log(`VkInstanceCreateInfo {`);
+            console.log(`   sType: ${createInfo.sType};`);
+            console.log(`   pNext: ${createInfo.pNext};`);
+            console.log(`   flags: ${createInfo.flags};`);
+            console.log(`   pApplicationInfo: ${createInfo.pApplicationInfo};`);
+            console.log(`   enabledLayerCount: ${createInfo.enabledLayerCount};`);
+            console.log(`   ppEnabledLayerNames: ${createInfo.ppEnabledLayerNames};`);
+            console.log(`   enabledExtensionCount: ${createInfo.enabledExtensionCount};`);
+            console.log(`   ppEnabledExtensionNames: ${createInfo.ppEnabledExtensionNames};`);
+            console.log(`};`);
 
-// Currently, NVK working WRONG (I even Attemped to use global address hack)
-console.log(`VkApplicationInfo {`);
-console.log(`   sType: ${appInfo.sType};`);
-console.log(`   pNext: ${appInfo.pNext};`);
-console.log(`   pApplicationName: ${appInfo.pApplicationInfo};`);
-console.log(`   applicationVersion: ${appInfo.pApplicationName};`);
-console.log(`   pEngineName: ${appInfo.pEngineName};`);
-console.log(`   engineVersion: ${appInfo.engineVersion};`);
-console.log(`   apiVersion: ${appInfo.apiVersion};`);
-console.log(`};`);
+            // 
+            let appInfo = createInfo.pApplicationInfo;
+            appInfo.reflect();
+
+            // Currently, NVK working WRONG (I even Attemped to use global address hack)
+            console.log(`VkApplicationInfo {`);
+            console.log(`   sType: ${appInfo.sType};`);
+            console.log(`   pNext: ${appInfo.pNext};`);
+            console.log(`   pApplicationName: ${appInfo.pApplicationInfo};`);
+            console.log(`   applicationVersion: ${appInfo.applicationVersion};`);
+            console.log(`   pEngineName: ${appInfo.pEngineName};`);
+            console.log(`   engineVersion: ${appInfo.engineVersion};`);
+            console.log(`   apiVersion: ${appInfo.apiVersion};`);
+            console.log(`};`);
 
             let instance = new VkInstance({ $memoryOffset: instanceAddress, $memoryBuffer: memory.buffer });
             return vkCreateInstance(createInfo, allocatorAddress, instance);
