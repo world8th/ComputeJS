@@ -32,7 +32,7 @@
     "binaryen": "^90.0.0",
     "cross-blob": "^1.2.1",
     "gl-matrix": "^3.1.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "node-fetch": "^2.6.0",
     "nvk": "^0.7.9",
     "serialize-javascript": "^2.1.2",
