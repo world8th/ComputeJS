@@ -33,7 +33,7 @@
     "cross-blob": "^1.2.1",
     "gl-matrix": "^3.1.0",
     "lodash": "^4.17.15",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "nvk": "^0.7.9",
     "serialize-javascript": "^2.1.2",
     "wabt": "^1.0.12",
